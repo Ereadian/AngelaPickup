@@ -18,3 +18,5 @@ jobs:
         run: dotnet --version
       - name: create html builder
         run: dotnet build tools/builder/
+      - name: run html builder
+        run: ./tools/builder/build/bin/Debug/net10.0/build
