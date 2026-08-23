@@ -1,3 +1,7 @@
+#dotnet
+obj/
+bin/
+
 # Logs
 logs
 *.log
