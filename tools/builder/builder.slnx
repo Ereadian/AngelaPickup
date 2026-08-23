@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="build/build.csproj" />
   <Project Path="html-builder/html-builder.csproj" />
 </Solution>

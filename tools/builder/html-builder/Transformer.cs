@@ -1,4 +1,4 @@
-﻿namespace ereadian.html.builder;
+﻿namespace ereadian.builder.html;
 
 public class Transformer
 {
