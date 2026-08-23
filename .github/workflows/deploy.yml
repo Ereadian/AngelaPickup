@@ -18,9 +18,9 @@ jobs:
       - name: Display dotnet version
         run: dotnet --version
       - name: create html builder
-        run: dotnet build tools/builder/
+        run: dotnet build -c Release tools/builder/
       - name: run html builder
-        run: ./tools/builder/build/bin/Debug/net10.0/build
+        run: ./tools/builder/build/bin/Release/net10.0/build
   #deploy page
   deploy:
     permissions:
