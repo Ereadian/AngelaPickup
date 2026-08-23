@@ -1,4 +1,4 @@
-name: build and deploy static pages
+name: build and deploy static pages by dotnet
 on:
   push:
     branches: ["main"]
