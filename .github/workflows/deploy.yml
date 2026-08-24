@@ -16,7 +16,7 @@ jobs:
       url: ${{steps.deployment.outputs.page_url}}
     runs-on: ubuntu-latest
     steps:
-      # build job
+      # build tool
       - name: checkout
         uses: actions/checkout@v6
       - name: Setup dotnet ${{ matrix.dotnet-version }}
@@ -27,11 +27,12 @@ jobs:
         run: dotnet --version
       - name: create html builder
         run: dotnet build -c Release tools/builder/
-      - name: run html builder
-        run: ./tools/builder/build/bin/Release/net10.0/build
     # run test
       - name: Run unit test
         run: dotnet test ./tools/builder/builder.slnx --no-build -c Release
+      # build pages
+      - name: run html builder
+        run: ./tools/builder/build/bin/Release/net10.0/build
     #deploy page
       - name: Setup Pages
         uses: actions/configure-pages@v5
