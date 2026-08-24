@@ -39,6 +39,8 @@ internal class Program
         Console.WriteLine("\tCulture: {0}", transformer.SiteCultureInfo.DisplayName);
         Process(transformer, sourceFolder, targetFolder, string.Empty, string.Empty);
         Console.WriteLine("Build completed.");
+
+        File.WriteAllText(Path.Combine(targetFolder, "test.txt"), "Test");
         return 0;
     }
 
