@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="build/build.csproj" />
   <Project Path="html-builder/html-builder.csproj" />
+  <Project Path="unit-test/unit-test.csproj" />
 </Solution>

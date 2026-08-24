@@ -29,6 +29,9 @@ jobs:
         run: dotnet build -c Release tools/builder/
       - name: run html builder
         run: ./tools/builder/build/bin/Release/net10.0/build
+    # run test
+      - name: Run unit test
+        run: dotnet test ./tools/builder/builder.slnx --no-build -c Release
     #deploy page
       - name: Setup Pages
         uses: actions/configure-pages@v5
