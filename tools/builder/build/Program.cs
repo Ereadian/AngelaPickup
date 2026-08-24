@@ -7,7 +7,7 @@ using ereadian.builder.html;
 internal class Program
 {
     private const string DefaultSourceFolder = "docs";
-    private const string DefaultTargetFolder = "contents";
+    private const string DefaultTargetFolder = "page-output";
     private const string TemplateFolder = "templates";
     private const string HtmlFileExtension = ".html";
 
@@ -39,8 +39,6 @@ internal class Program
         Console.WriteLine("\tCulture: {0}", transformer.SiteCultureInfo.DisplayName);
         Process(transformer, sourceFolder, targetFolder, string.Empty, string.Empty);
         Console.WriteLine("Build completed.");
-
-        File.WriteAllText(Path.Combine(targetFolder, "test.txt"), "Test");
         return 0;
     }
 
@@ -67,7 +65,7 @@ internal class Program
             else
             {
                 Console.Write("\t process {0}", fileName);
-                string finalHtml = transformer.Process(File.ReadAllText(fileFullPath));
+                string finalHtml = transformer.ProcessFile(fileFullPath, sourceFolder);
                 File.WriteAllText(finalTargetFileName, finalHtml);
             }
 

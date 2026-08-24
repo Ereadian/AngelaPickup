@@ -1,15 +1,11 @@
-﻿using System.Globalization;
+﻿namespace ereadian.builder.html;
 
-namespace ereadian.builder.html;
+using System.Globalization;
+using ereadian.builder.html.Content;
 
 public class Transformer
 {
-    private readonly CultureInfo siteCultureInfo;
-
-    private readonly Dictionary<string, object> variables = new()
-    {
-      {VariableNames.SiteBuildTime, DateTime.UtcNow }
-    };
+    private readonly Dictionary<string, object> globalVariables; 
 
     public Transformer(string templateFolder, string siteCultureName)
         : this(templateFolder, CultureInfo.GetCultureInfo(siteCultureName))
@@ -18,14 +14,25 @@ public class Transformer
 
     public Transformer(string templateFolder, CultureInfo cultureInfo)
     {
-        this.siteCultureInfo = cultureInfo;
+        this.SiteCultureInfo = cultureInfo;
+        this.globalVariables = new()
+        {
+            {VariableNames.TemplateFolder, templateFolder },
+            {VariableNames.TemplateCollection, new Dictionary<string, HtmlFile>() },
+            {VariableNames.SiteCulture, cultureInfo },
+            {VariableNames.SiteBuildTime, DateTime.UtcNow },
+        };
     }
 
-    public IDictionary<string, object> Variables => this.variables;
-    public CultureInfo SiteCultureInfo => this.siteCultureInfo;
+    public CultureInfo SiteCultureInfo {get;}
 
     public string Process(string sourceContent)
     {
         return sourceContent;
+    }
+
+    public string ProcessFile(string fullPath, string folder)
+    {
+        return this.Process(File.ReadAllText(fullPath));
     }
 }
