@@ -1,6 +1,7 @@
 #dotnet
 obj/
 bin/
+contents/
 
 # Logs
 logs
