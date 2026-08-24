@@ -20,6 +20,8 @@ public class AttributeNode(string name,string data)
         }
     }
 
+    public NodeType NodeType => NodeType.Attribute;
+
     public void Render(in StringBuilder builder, in IDictionary<string, object> variables)
     {
         _ = builder.AppendFormat("{0}={1}", name, data);

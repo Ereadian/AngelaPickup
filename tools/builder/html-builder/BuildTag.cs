@@ -6,5 +6,8 @@ public enum BuildTag
     Build,
 
     // set variable action
-    Variable
+    Variable,
+
+    // specific template name
+    Template,
 }

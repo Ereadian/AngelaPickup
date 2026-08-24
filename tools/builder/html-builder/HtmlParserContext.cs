@@ -46,4 +46,29 @@ public class HtmlParserContext
 
         return false;
     }
+
+    public bool StartsWith(string value, int position)
+    {
+        if (position + value.Length > this.Content.Length)
+        {
+            return false;
+        }
+
+        for(int i=0; i<value.Length;i++)
+        {
+            if (value[i] != this.Content[position])
+            {
+                return false;
+            }
+
+            position++;
+        }
+
+        return true;
+    }
+
+    public bool StartsWith(string value)
+    {
+        return StartsWith(value, this.CurrentPosition);
+    }
 }

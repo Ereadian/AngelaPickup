@@ -4,15 +4,15 @@ using System.Globalization;
 
 public static class BuildFunctions
 {
-    public static IReadOnlyDictionary<string, Func<string, string, IDictionary<string, object>, CultureInfo, string>> Functions
-        => new Dictionary<string, Func<string, string, IDictionary<string, object>, CultureInfo, string>>()
+    public static IReadOnlyDictionary<string, Func<string, string, IDictionary<string, object>, string>> Functions
+        => new Dictionary<string, Func<string, string, IDictionary<string, object>, string>>()
         {
             {VariableNames.SiteBuildTime, RenderSiteBuildTime},
         };
 
-    public static string RenderSiteBuildTime(string name, string data, IDictionary<string, object> variables, CultureInfo siteCulture)
+    public static string RenderSiteBuildTime(string name, string data, IDictionary<string, object> variables)
     {
         DateTime siteBuildTime = (DateTime)variables[VariableNames.SiteBuildTime];
-        return siteBuildTime.ToString(siteCulture);
+        return siteBuildTime.ToString(variables[VariableNames.SiteCulture] as CultureInfo);
     }
 }
