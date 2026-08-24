@@ -1,6 +1,7 @@
 namespace ereadian.builder.UnitTest;
 
 [TestClass]
+[ExcludeFromCodeCoverage]
 public sealed class TemporaryFileUnitTest
 {
     [TestMethod]

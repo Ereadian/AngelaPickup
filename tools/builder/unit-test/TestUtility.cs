@@ -2,6 +2,7 @@ namespace ereadian.builder.UnitTest;
 
 using System.Text;
 
+[ExcludeFromCodeCoverage]
 public static class TestUtility
 {
     public static string CreateUniqueName(string? prefix = "Data")

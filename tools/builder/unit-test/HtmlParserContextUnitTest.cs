@@ -4,6 +4,7 @@ using System.Text;
 using ereadian.builder.html;
 
 [TestClass]
+[ExcludeFromCodeCoverage]
 public sealed class HtmlParserContextUnitTest
 {
     [TestMethod]
