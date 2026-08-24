@@ -4,5 +4,5 @@ using System.Text;
 
 public interface IHtmlNode
 {
-    void Render(in StringBuilder builder,  in IDictionary<string, object> variables);
+    void Render(in StringBuilder builder, in IDictionary<string, object> variables);
 }

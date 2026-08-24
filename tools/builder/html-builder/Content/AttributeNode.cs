@@ -19,6 +19,7 @@ public class AttributeNode(string name,string data)
             return this.value;
         }
     }
+
     public void Render(in StringBuilder builder, in IDictionary<string, object> variables)
     {
         _ = builder.AppendFormat("{0}={1}", name, data);
