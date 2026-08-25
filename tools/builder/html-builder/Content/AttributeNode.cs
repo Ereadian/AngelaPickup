@@ -1,26 +1,24 @@
 namespace ereadian.builder.html.Content;
 
 using System.Text;
+using System.Web;
 
 public class AttributeNode(string name,string data)
     : IHtmlNode
 {
     private string? value = null;
 
+    public NodeType NodeType => NodeType.Attribute;
+    public string Name => name;
+    public string Data => data;
     public string Value
     {
         get
         {
-            if (this.value is null)
-            {
-                this.value = data[1..^1];
-            }
-
+            this.value ??= HttpUtility.HtmlDecode(data[1..^1]);
             return this.value;
         }
     }
-
-    public NodeType NodeType => NodeType.Attribute;
 
     public void Render(in StringBuilder builder, in IDictionary<string, object> variables)
     {

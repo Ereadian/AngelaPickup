@@ -6,10 +6,12 @@ public class HtmlFile : INodeCollection
 {
     public HtmlFile(string fullPath, string folder)
     {
-        Dictionary<string, object> variables = [];
         HtmlParserContext context = new (fullPath, folder);
+        this.Nodes = Utility.LoadNodes(context);
+
+        Dictionary<string, object> variables = context.Variables;
         this.Variables = variables;
-        this.Nodes = Utility.LoadNodes(context, variables);
+
         string? templateName = null;
         if (variables.TryGetValue(VariableNames.TemplateName, out object? value))
         {

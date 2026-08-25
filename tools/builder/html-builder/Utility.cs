@@ -1,6 +1,7 @@
-using ereadian.builder.html.Content;
-
 namespace ereadian.builder.html;
+
+using System.Text;
+using ereadian.builder.html.Content;
 
 public static class Utility
 {
@@ -13,9 +14,21 @@ public static class Utility
         variables[VariableNames.CurrentFolder] = folder;
         variables[VariableNames.CurrentFileName] = Path.GetFileName(fullPath);
         variables[VariableNames.CurrentFileNameNoExtension] = Path.GetFileNameWithoutExtension(fullPath);
+        variables[VariableNames.CurrentSourceFileFullPath] = fullPath;
     }
 
-    public static IReadOnlyList<IHtmlNode> LoadNodes(HtmlParserContext context, Dictionary<string, object> variables)
+    public static void RenderNodes(
+        in IReadOnlyList<IHtmlNode> nodes,
+        in StringBuilder builder,
+        in IDictionary<string, object> variables)
+    {
+        foreach(IHtmlNode node in nodes)
+        {
+            node.Render(builder, variables);
+        }
+    }
+
+    public static IReadOnlyList<IHtmlNode> LoadNodes(HtmlParserContext context)
     {
         List<IHtmlNode> nodes = [];
         while (!context.IsEnd())
@@ -61,14 +74,50 @@ public static class Utility
                 else
                 {
                     throw new InvalidDataException(
-                        $"Unknown segment. File: '{context.FullPath}'.Content:\n{context.Content.Substring(context.CurrentPosition)}");
+                        $"Unknown html special tag. File: '{context.FullPath}'.Content:\n{context.Content.Substring(context.CurrentPosition)}");
                 }
 
                 continue;
             }
+
+            if (context.StartsWith("</"))
+            {
+                break;
+            }
+
+            int elementStartPosition = context.CurrentPosition;
+            ElementNode elementNode = ElementNode.Parse(context);
+            if (elementNode.Name != "build")
+            {
+                nodes.Add(elementNode);
+            }
+            else
+            {
+                const string BuildNameAttributeName = "name";
+                string buildName = GetAttributeValue(elementNode.Attributes, BuildNameAttributeName);
+                if (string.IsNullOrEmpty(buildName))
+                {
+                    throw new InvalidDataException(
+                        $"Build element requires '{BuildNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                }
+
+                if (!BuildActions.Actions.TryGetValue(buildName, out var buildAction))
+                {
+                    throw new InvalidDataException(
+                        $"Unknown build action name '{buildName}'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                }
+
+                DynamicNode dynamicNode = new (elementNode, buildAction);
+                nodes.Add(dynamicNode);
+            }
         }
 
         return nodes;
+    }
+
+    public static string GetAttributeValue(IReadOnlyList<AttributeNode> attributeNodes, string name)
+    {
+        return attributeNodes.FirstOrDefault(attribute => attribute.Name == name)?.Data ?? string.Empty;
     }
 
     private static PlaintNode CreateMarkNode(HtmlParserContext context, string openTag, string closeTag)

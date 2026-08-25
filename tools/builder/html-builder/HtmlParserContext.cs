@@ -1,12 +1,14 @@
+using System.Text;
+
 namespace ereadian.builder.html;
 
 public class HtmlParserContext
 {
-    public Dictionary<string, object> Variables {get;}
-    public string FullPath {get;}
-    public string Folder {get;}
-    public string Content {get;}
-    public int CurrentPosition {get; set;} = 0;
+    public Dictionary<string, object> Variables { get; }
+    public string FullPath { get; }
+    public string Folder { get; }
+    public string Content { get; }
+    public int CurrentPosition { get; set; } = 0;
 
     public HtmlParserContext(string fullPath, string folder)
     {
@@ -19,11 +21,16 @@ public class HtmlParserContext
 
     public bool IsEnd()
     {
-        return this.CurrentPosition >= this.Content.Length; 
+        return this.CurrentPosition >= this.Content.Length;
     }
 
     public char GetCurrentChar()
     {
+        if (this.IsEnd())
+        {
+            throw new InvalidDataException("No character in remain content because reaches the end.");
+        }
+
         return this.Content[this.CurrentPosition];
     }
 
@@ -33,7 +40,7 @@ public class HtmlParserContext
     /// <returns>True if meets none-whitespace character. False if reaches end.</returns>
     public bool SkipWhiteSpace()
     {
-        while(!this.IsEnd())
+        while (!this.IsEnd())
         {
             char c = this.GetCurrentChar();
             if (!char.IsWhiteSpace(c))
@@ -54,7 +61,7 @@ public class HtmlParserContext
             return false;
         }
 
-        for(int i=0; i<value.Length;i++)
+        for (int i = 0; i < value.Length; i++)
         {
             if (value[i] != this.Content[position])
             {
@@ -70,5 +77,30 @@ public class HtmlParserContext
     public bool StartsWith(string value)
     {
         return StartsWith(value, this.CurrentPosition);
+    }
+
+    public string GetName(int position)
+    {
+        StringBuilder builder = new(100);
+        while(position < this.Content.Length)
+        {
+            char c = this.Content[position];
+            if (char.IsNumber(c) || char.IsLetter(c) || (c==':') || (c=='-') || (c=='_'))
+            {
+                _ = builder.Append(c);
+                position++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    public string GetName()
+    {
+        return GetName(this.CurrentPosition);
     }
 }

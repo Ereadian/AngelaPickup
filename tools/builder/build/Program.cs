@@ -32,7 +32,7 @@ internal class Program
         string sourceFolder = arguments.Length < 1 ? GetRepositorySubFolder(DefaultSourceFolder) : Path.GetFullPath(arguments[0]);
         string targetFolder = arguments.Length < 2 ? GetRepositorySubFolder(DefaultTargetFolder) : Path.GetFullPath(arguments[1]);
 
-        Transformer transformer = new(GetRepositorySubFolder(TemplateFolder), new CultureInfo("zh-han"));
+        Transformer transformer = new(GetRepositorySubFolder(TemplateFolder), new CultureInfo("zh-Hans"));
         Console.WriteLine("Start building.");
         Console.WriteLine("\tSource: {0}", sourceFolder);
         Console.WriteLine("\tTarget: {0}", targetFolder);
