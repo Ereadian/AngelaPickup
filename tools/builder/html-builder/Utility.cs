@@ -87,28 +87,59 @@ public static class Utility
 
             int elementStartPosition = context.CurrentPosition;
             ElementNode elementNode = ElementNode.Parse(context);
-            if (elementNode.Name != "build")
+            switch(elementNode.Name)
             {
-                nodes.Add(elementNode);
-            }
-            else
-            {
-                const string BuildNameAttributeName = "name";
-                string buildName = GetAttributeValue(elementNode.Attributes, BuildNameAttributeName);
-                if (string.IsNullOrEmpty(buildName))
-                {
-                    throw new InvalidDataException(
-                        $"Build element requires '{BuildNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
-                }
+                case "variable":
+                    const string VariableNameAttributeName = "name";
+                    string variableName = GetAttributeValue(elementNode.Attributes, VariableNameAttributeName);
+                    if (string.IsNullOrEmpty(variableName))
+                    {
+                        throw new InvalidDataException(
+                            $"Variable element requires '{VariableNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                    }
 
-                if (!BuildActions.Actions.TryGetValue(buildName, out var buildAction))
-                {
-                    throw new InvalidDataException(
-                        $"Unknown build action name '{buildName}'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
-                }
+                    const string VariableValueAttributeName = "value";
+                    string variableValue = GetAttributeValue(elementNode.Attributes, VariableValueAttributeName);
+                    if (string.IsNullOrEmpty(variableValue))
+                    {
+                        throw new InvalidDataException(
+                            $"Variable element requires '{VariableValueAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                    }
 
-                DynamicNode dynamicNode = new (elementNode, buildAction);
-                nodes.Add(dynamicNode);
+                    context.Variables[variableName] = variableValue;
+                    break;
+                case "template":
+                    const string TemplateNameAttributeName = "name";
+                    string templateName = GetAttributeValue(elementNode.Attributes, TemplateNameAttributeName);
+                    if (string.IsNullOrEmpty(templateName))
+                    {
+                        throw new InvalidDataException(
+                            $"Template element requires '{TemplateNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                    }
+
+                    context.Variables[VariableNames.TemplateName] = templateName;
+                    break;
+                case "build":
+                    const string BuildNameAttributeName = "name";
+                    string buildName = GetAttributeValue(elementNode.Attributes, BuildNameAttributeName);
+                    if (string.IsNullOrEmpty(buildName))
+                    {
+                        throw new InvalidDataException(
+                            $"Build element requires '{BuildNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                    }
+
+                    if (!BuildActions.Actions.TryGetValue(buildName, out var buildAction))
+                    {
+                        throw new InvalidDataException(
+                            $"Unknown build action name '{buildName}'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                    }
+
+                    DynamicNode dynamicNode = new (elementNode, buildAction);
+                    nodes.Add(dynamicNode);
+                    break;
+                default:
+                    nodes.Add(elementNode);
+                    break;
             }
         }
 
