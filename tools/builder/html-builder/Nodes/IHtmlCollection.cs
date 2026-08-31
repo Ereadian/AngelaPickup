@@ -1,4 +1,4 @@
-namespace ereadian.builder.html.Content;
+namespace ereadian.builder.html.Nodes;
 
 public interface INodeCollection : IHtmlNode
 {

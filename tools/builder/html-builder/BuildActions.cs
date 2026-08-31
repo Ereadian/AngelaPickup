@@ -2,7 +2,7 @@ namespace ereadian.builder.html;
 
 using System.Globalization;
 using System.Text;
-using ereadian.builder.html.Content;
+using ereadian.builder.html.Nodes;
 
 public static class BuildActions
 {

@@ -1,7 +1,7 @@
 namespace ereadian.builder.html;
 
 using System.Text;
-using ereadian.builder.html.Content;
+using ereadian.builder.html.Nodes;
 
 public static class Utility
 {
