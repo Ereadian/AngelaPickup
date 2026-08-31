@@ -4,14 +4,9 @@ namespace ereadian.builder.html;
 
 public class HtmlParserContext
 {
-    public Dictionary<string, object> Variables { get; }
-    public string FullPath { get; }
-    public string Folder { get; }
-    public string Content { get; }
-    public int CurrentPosition { get; set; } = 0;
-
-    public HtmlParserContext(string fullPath, string folder)
+    public HtmlParserContext(string fullPath, string folder, bool allowComment)
     {
+        this.AllowComment = allowComment;
         this.FullPath = fullPath;
         this.Folder = folder;
         this.Content = File.ReadAllText(fullPath);
@@ -24,6 +19,13 @@ public class HtmlParserContext
         variables[VariableNames.CurrentSourceFileFullPath] = fullPath;
         this.Variables = variables;
     }
+
+    public bool AllowComment {get;}
+    public Dictionary<string, object> Variables { get; }
+    public string FullPath { get; }
+    public string Folder { get; }
+    public string Content { get; }
+    public int CurrentPosition { get; set; } = 0;
 
     public bool IsEnd()
     {

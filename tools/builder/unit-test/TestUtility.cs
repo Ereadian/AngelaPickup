@@ -1,6 +1,7 @@
 namespace ereadian.builder.UnitTest;
 
 using System.Text;
+using ereadian.builder.html;
 
 [ExcludeFromCodeCoverage]
 public static class TestUtility
@@ -40,5 +41,18 @@ public static class TestUtility
         StringBuilder builder = new(count);
         AppendRandomWhiteSpaces(builder, random, count);
         return builder.ToString();
+    }
+
+
+    public static HtmlParserContext CreateContext(Random random, string content, bool allowComment = true)
+    {
+        string fileNameNoExtension = TestUtility.CreateUniqueName("Test");
+        string fileName = $"{fileNameNoExtension}.html";
+        using TemporaryFile temporaryFile = new(fileName);
+        string fullPath = temporaryFile.FullPath;
+        string folder = TestUtility.CreateRandomFolders(random.Next(2, 5));
+        File.WriteAllText(fullPath, content);
+
+        return new HtmlParserContext(fullPath, folder, allowComment);
     }
 }

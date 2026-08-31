@@ -4,9 +4,9 @@ using System.Text;
 
 public class HtmlFile : INodeCollection
 {
-    public HtmlFile(string fullPath, string folder)
+    public HtmlFile(string fullPath, string folder, bool allowComment)
     {
-        HtmlParserContext context = new (fullPath, folder);
+        HtmlParserContext context = new (fullPath, folder, allowComment);
         this.Nodes = Utility.LoadNodes(context);
 
         Dictionary<string, object> variables = context.Variables;

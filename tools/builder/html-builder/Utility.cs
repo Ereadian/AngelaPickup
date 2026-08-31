@@ -57,7 +57,11 @@ public static class Utility
                 }
                 else if (context.StartsWith(CommentOpenTag))
                 {
-                    nodes.Add(CreateMarkNode(context, CommentOpenTag, CommentCloseTag));
+                    LiteratureNode node = CreateMarkNode(context, CommentOpenTag, CommentCloseTag);
+                    if (context.AllowComment)
+                    {
+                        nodes.Add(node);
+                    }
                 }
                 else
                 {

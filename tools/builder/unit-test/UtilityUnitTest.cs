@@ -72,6 +72,81 @@ public sealed class UtilityUnitTest
         Assert.AreEqual(string.Empty, actual);
     }
 
+    [TestMethod]
+    public void Utility_LoadNodes_EmptyContentReturnEmpty()
+    {
+        // Arrange
+        HtmlParserContext context = TestUtility.CreateContext(Random.Shared, string.Empty);
+
+        // Act
+        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context);
+
+        // Assert
+        Assert.IsEmpty(nodes);
+    }
+
+    [TestMethod]
+    [DataRow("   ", "\n", true, true, DisplayName = "Literature")]
+    [DataRow("<![CDATA[", "]]>", true, true, DisplayName = "CData")]
+    [DataRow("<!DOCTYPE", ">", true, true, DisplayName = "Doc Type")]
+    [DataRow("<!--", "-->", true, true, DisplayName = "Comment (allowed)")]
+    [DataRow("<!--", "-->", false, false, DisplayName = "Comment (not allowed)")]
+    public void Utility_LoadNodes_SingleLiteratureNode_ReturnExpected(string startTag, string endTag, bool allowComment, bool generated)
+    {
+        // Arrange
+        string content = $"{startTag}{TestUtility.CreateUniqueName("content")}{endTag}";
+        HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, allowComment);
+
+        // Act
+        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context);
+
+        // Assert
+        if (generated)
+        {
+            StringBuilder builder = new();
+            Dictionary<string, object> variables = [];
+            Utility.RenderNodes(nodes, builder, variables);
+            Assert.AreEqual(content, builder.ToString());
+        }
+        else
+        {
+            Assert.IsEmpty(nodes);
+        }
+    }
+
+    [TestMethod]
+    public void Utility_LoadNodes_SingleVariableNode_ReturnExpected()
+    {
+        // Arrange
+        string name = TestUtility.CreateUniqueName("name");
+        string value = TestUtility.CreateUniqueName("value");
+        string content = $"<variable name='{name}' value='{value}' />";
+        HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, true);
+
+        // Act
+        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context);
+
+        // Asset
+        Assert.IsEmpty(nodes);
+        Assert.AreEqual(value, context.Variables[name]);
+    }
+
+    [TestMethod]
+    public void Utility_LoadNodes_SingleTemplateNode_ReturnExpected()
+    {
+        // Arrange
+        string name = TestUtility.CreateUniqueName("name");
+        string content = $"<template name='{name}'/>";
+        HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, true);
+
+        // Act
+        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context);
+
+        // Asset
+        Assert.IsEmpty(nodes);
+        Assert.AreEqual(name, context.Variables[VariableNames.TemplateName]);
+    }
+
     private class NodeForTest(string name, string content) : IHtmlNode
     {
         public NodeType NodeType => NodeType.Dynamic;

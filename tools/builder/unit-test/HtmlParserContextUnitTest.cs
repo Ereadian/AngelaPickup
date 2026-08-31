@@ -15,7 +15,9 @@ public sealed class HtmlParserContextUnitTest
     }
 
     [TestMethod]
-    public void HtmlParserContext_Constructor_AllPropertiesAreSet()
+    [DataRow(true, DisplayName = "Allow Comment")]
+    [DataRow(false, DisplayName = "Not Allow Comment")]
+    public void HtmlParserContext_Constructor_AllPropertiesAreSet(bool allowComment)
     {
         // Arrange
         Random random = Random.Shared;
@@ -29,9 +31,10 @@ public sealed class HtmlParserContextUnitTest
         File.WriteAllText(fullPath, content);
 
         // Act
-        HtmlParserContext context = new(fullPath, folder);
+        HtmlParserContext context = new(fullPath, folder,allowComment);
 
         // Asset
+        Assert.AreEqual(allowComment, context.AllowComment);
         Assert.AreEqual(fullPath, context.FullPath);
         Assert.AreEqual(folder, context.Folder);
         Assert.AreEqual(content, context.Content);
@@ -65,7 +68,7 @@ public sealed class HtmlParserContextUnitTest
             _ = builder.Append(suffix);
         }
 
-        HtmlParserContext context = CreateContext(random, builder.ToString());
+        HtmlParserContext context = TestUtility.CreateContext(random, builder.ToString());
         context.CurrentPosition = prefix.Length;
 
         // Act
@@ -94,7 +97,7 @@ public sealed class HtmlParserContextUnitTest
             _ = builder.Append(suffix);
         }
 
-        HtmlParserContext context = CreateContext(random, builder.ToString());
+        HtmlParserContext context = TestUtility.CreateContext(random, builder.ToString());
         context.CurrentPosition = prefix.Length;
 
         // Act
@@ -114,7 +117,7 @@ public sealed class HtmlParserContextUnitTest
         // Arrange
         Random random = Random.Shared;
         string content = TestUtility.CreateUniqueName("content");
-        HtmlParserContext context = CreateContext(random, content);
+        HtmlParserContext context = TestUtility.CreateContext(random, content);
         context.CurrentPosition = positionCode switch
         {
             Location.Start => 0,
@@ -162,7 +165,7 @@ public sealed class HtmlParserContextUnitTest
         };
 
         char expected = builder[position];
-        HtmlParserContext context = CreateContext(random, builder.ToString());
+        HtmlParserContext context = TestUtility.CreateContext(random, builder.ToString());
         context.CurrentPosition = position;
 
         // Act
@@ -188,7 +191,7 @@ public sealed class HtmlParserContextUnitTest
         int suffixCharCount = positionCode == Location.End ? 0 : random.Next(5, 10);
         AppendRandomString(builder, random, suffixCharCount);
 
-        HtmlParserContext context = CreateContext(random, builder.ToString());
+        HtmlParserContext context = TestUtility.CreateContext(random, builder.ToString());
 
         // Arrange
         bool expected = context.StartsWith(searchValue, prefixCharCount);
@@ -213,7 +216,7 @@ public sealed class HtmlParserContextUnitTest
             content = builder.ToString();
         } while(content.IndexOf(searchValue) < 0);
 
-        HtmlParserContext context = CreateContext(random, content);
+        HtmlParserContext context = TestUtility.CreateContext(random, content);
 
         // Arrange
         bool expected = context.StartsWith(searchValue, searchValue.Length);
@@ -233,7 +236,7 @@ public sealed class HtmlParserContextUnitTest
         StringBuilder builder = new (count);
         AppendRandomString(builder, random, count);
         _ = builder.Append(searchValue.Substring(0, searchValue.Length / 2));
-        HtmlParserContext context = CreateContext(random, builder.ToString());
+        HtmlParserContext context = TestUtility.CreateContext(random, builder.ToString());
 
         // Arrange
         bool expected = context.StartsWith(searchValue, count);
@@ -267,7 +270,7 @@ public sealed class HtmlParserContextUnitTest
             AppendRandomString(builder, random, random.Next(5, 10));
         }
 
-        HtmlParserContext context = CreateContext(random, builder.ToString());
+        HtmlParserContext context = TestUtility.CreateContext(random, builder.ToString());
         int currentPosition = random.Next(1, builder.Length);
         context.CurrentPosition = currentPosition;
 
@@ -286,7 +289,7 @@ public sealed class HtmlParserContextUnitTest
         Random random = Random.Shared;
         StringBuilder builder = new();
         AppendRandomString(builder, random, random.Next(5, 10));
-        HtmlParserContext context = CreateContext(random, builder.ToString());
+        HtmlParserContext context = TestUtility.CreateContext(random, builder.ToString());
 
         // Act
         string actual = context.GetName(builder.Length);
@@ -307,7 +310,7 @@ public sealed class HtmlParserContextUnitTest
         AppendRandomString(builder, random, random.Next(5, 10));
         int currentPosition = builder.Length;
         _ = builder.Append(currentCharacter);
-        HtmlParserContext context = CreateContext(random, builder.ToString());
+        HtmlParserContext context = TestUtility.CreateContext(random, builder.ToString());
 
         // Act
         string actual = context.GetName(currentPosition);
@@ -322,17 +325,5 @@ public sealed class HtmlParserContextUnitTest
         {
             _ = builder.Append((char)random.Next(' ', '~' - ' '));
         }
-    }
-
-    private static HtmlParserContext CreateContext(Random random, string content)
-    {
-        string fileNameNoExtension = TestUtility.CreateUniqueName("Test");
-        string fileName = $"{fileNameNoExtension}.html";
-        using TemporaryFile temporaryFile = new(fileName);
-        string fullPath = temporaryFile.FullPath;
-        string folder = TestUtility.CreateRandomFolders(random.Next(2, 5));
-        File.WriteAllText(fullPath, content);
-
-        return new HtmlParserContext(fullPath, folder);
     }
 }
