@@ -85,7 +85,7 @@ public class HtmlParserContext
         while(position < this.Content.Length)
         {
             char c = this.Content[position];
-            if (char.IsNumber(c) || char.IsLetter(c) || (c==':') || (c=='-') || (c=='_'))
+            if (char.IsNumber(c) || char.IsLetter(c) || (c==':') || (c=='-') || (c=='_') || (c == '.'))
             {
                 _ = builder.Append(c);
                 position++;

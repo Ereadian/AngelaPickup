@@ -242,6 +242,80 @@ public sealed class HtmlParserContextUnitTest
         Assert.IsFalse(expected);
     }
 
+    [TestMethod]
+    [DataRow(Location.Start, DisplayName = "At beginning")]
+    [DataRow(Location.Middle, DisplayName = "In the middle")]
+    [DataRow(Location.End, DisplayName = "At the end")]
+    public void HtmlParserContext_GetName_ReturnExpected(Location positionCode)
+    {
+        // Arrange
+        Random random = Random.Shared;
+        StringBuilder builder = new();
+        string expected = "This-is_a:Test.0123456789" + TestUtility.CreateUniqueName();
+        int startIndex = 0;
+        if (positionCode != Location.Start)
+        {
+            startIndex = random.Next(5, 10);
+            AppendRandomString(builder, random, startIndex);
+        }
+
+        _ = builder.Append(expected);
+
+        if (positionCode != Location.End)
+        {
+            _ = builder.Append(' ');
+            AppendRandomString(builder, random, random.Next(5, 10));
+        }
+
+        HtmlParserContext context = CreateContext(random, builder.ToString());
+        int currentPosition = random.Next(1, builder.Length);
+        context.CurrentPosition = currentPosition;
+
+        // Act
+        string actual = context.GetName(startIndex);
+
+        // Assert
+        Assert.AreEqual(currentPosition, context.CurrentPosition);
+        Assert.AreEqual(expected, actual);
+    }
+
+    [TestMethod]
+    public void HtmlParserContext_GetName_ReachEnd_ReturnEmpty()
+    {
+        // Arrange
+        Random random = Random.Shared;
+        StringBuilder builder = new();
+        AppendRandomString(builder, random, random.Next(5, 10));
+        HtmlParserContext context = CreateContext(random, builder.ToString());
+
+        // Act
+        string actual = context.GetName(builder.Length);
+
+        // Assert
+        Assert.AreEqual(0, actual.Length);
+    }
+
+    [TestMethod]
+    [DataRow(' ', DisplayName = "Space")]
+    [DataRow('<', DisplayName = "Start tag")]
+    [DataRow('\n', DisplayName = "new Line")]
+    public void HtmlParserContext_GetName_NoNameCharacter_ReturnEmpty(char currentCharacter)
+    {
+        // Arrange
+        Random random = Random.Shared;
+        StringBuilder builder = new();
+        AppendRandomString(builder, random, random.Next(5, 10));
+        int currentPosition = builder.Length;
+        _ = builder.Append(currentCharacter);
+        HtmlParserContext context = CreateContext(random, builder.ToString());
+
+        // Act
+        string actual = context.GetName(currentPosition);
+
+        // Assert
+        Assert.AreEqual(0, actual.Length);
+    }
+
     public static void AppendRandomString(StringBuilder builder, Random random, int count)
     {
         for (int i = 0; i < count; i++)
