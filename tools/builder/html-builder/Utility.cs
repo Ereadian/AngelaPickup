@@ -42,7 +42,7 @@ public static class Utility
             int length = tagStart - context.CurrentPosition;
             if (length > 0)
             {
-                PlaintNode node = new PlaintNode(context.Content.Substring(context.CurrentPosition, length));
+                LiteratureNode node = new LiteratureNode(context.Content.Substring(context.CurrentPosition, length));
                 nodes.Add(node);
             }
 
@@ -151,7 +151,7 @@ public static class Utility
         return attributeNodes.FirstOrDefault(attribute => attribute.Name == name)?.Data ?? string.Empty;
     }
 
-    private static PlaintNode CreateMarkNode(HtmlParserContext context, string openTag, string closeTag)
+    private static LiteratureNode CreateMarkNode(HtmlParserContext context, string openTag, string closeTag)
     {
         int endTagPosition = context.Content.IndexOf(closeTag, context.CurrentPosition + openTag.Length);
         if (endTagPosition < 0)
@@ -163,7 +163,7 @@ public static class Utility
         int endPosition = endTagPosition + closeTag.Length;
         string data = context.Content.Substring(context.CurrentPosition, endPosition - context.CurrentPosition);
         context.CurrentPosition = endPosition;
-        return new PlaintNode(data);
+        return new LiteratureNode(data);
     }
 
     private static Dictionary<string, BuildTag> GetBuildTags()

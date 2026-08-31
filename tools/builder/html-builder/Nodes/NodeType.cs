@@ -3,7 +3,7 @@ namespace ereadian.builder.html.Nodes;
 public enum NodeType
 {
     Attribute,
-    Text,
+    Literature,
     Element,
     Dynamic,
     File,
