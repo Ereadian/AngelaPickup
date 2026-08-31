@@ -5,18 +5,6 @@ using ereadian.builder.html.Nodes;
 
 public static class Utility
 {
-    public static Dictionary<string, BuildTag> BuildTags {get;} = GetBuildTags();
-
-    public static void SetFileInfo(Dictionary<string, object> variables, string fullPath, string folder)
-    {
-        variables[VariableNames.CurrentFileCreationTime] = File.GetCreationTimeUtc(fullPath);
-        variables[VariableNames.CurrentFileLastModifiedTime] = File.GetLastWriteTimeUtc(fullPath);
-        variables[VariableNames.CurrentFolder] = folder;
-        variables[VariableNames.CurrentFileName] = Path.GetFileName(fullPath);
-        variables[VariableNames.CurrentFileNameNoExtension] = Path.GetFileNameWithoutExtension(fullPath);
-        variables[VariableNames.CurrentSourceFileFullPath] = fullPath;
-    }
-
     public static void RenderNodes(
         in IReadOnlyList<IHtmlNode> nodes,
         in StringBuilder builder,
@@ -148,7 +136,7 @@ public static class Utility
 
     public static string GetAttributeValue(IReadOnlyList<AttributeNode> attributeNodes, string name)
     {
-        return attributeNodes.FirstOrDefault(attribute => attribute.Name == name)?.Data ?? string.Empty;
+        return attributeNodes.FirstOrDefault(attribute => attribute.Name == name)?.Value ?? string.Empty;
     }
 
     private static LiteratureNode CreateMarkNode(HtmlParserContext context, string openTag, string closeTag)
@@ -164,17 +152,5 @@ public static class Utility
         string data = context.Content.Substring(context.CurrentPosition, endPosition - context.CurrentPosition);
         context.CurrentPosition = endPosition;
         return new LiteratureNode(data);
-    }
-
-    private static Dictionary<string, BuildTag> GetBuildTags()
-    {
-        string[] names = Enum.GetNames<BuildTag>();
-        Dictionary<string, BuildTag> tags = new(names.Length, StringComparer.OrdinalIgnoreCase);
-        foreach (string name in names)
-        {
-            tags.Add(name, Enum.Parse<BuildTag>(name));
-        }
-
-        return tags;
     }
 }

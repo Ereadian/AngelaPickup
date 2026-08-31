@@ -10,6 +10,8 @@ public sealed class TemporaryFileUnitTest
         // Arrange
         string fileName = $"{TestUtility.CreateUniqueName("Test")}.html";
         string fullPath;
+
+        // Act and Assert
         using (TemporaryFile temporaryFile = new (fileName))
         {
             fullPath = temporaryFile.FullPath;

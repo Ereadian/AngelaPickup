@@ -15,8 +15,14 @@ public class HtmlParserContext
         this.FullPath = fullPath;
         this.Folder = folder;
         this.Content = File.ReadAllText(fullPath);
-        this.Variables = [];
-        Utility.SetFileInfo(this.Variables, fullPath, folder);
+        Dictionary<string, object> variables = [];
+        variables[VariableNames.CurrentFileCreationTime] = File.GetCreationTimeUtc(fullPath);
+        variables[VariableNames.CurrentFileLastModifiedTime] = File.GetLastWriteTimeUtc(fullPath);
+        variables[VariableNames.CurrentFolder] = folder;
+        variables[VariableNames.CurrentFileName] = Path.GetFileName(fullPath);
+        variables[VariableNames.CurrentFileNameNoExtension] = Path.GetFileNameWithoutExtension(fullPath);
+        variables[VariableNames.CurrentSourceFileFullPath] = fullPath;
+        this.Variables = variables;
     }
 
     public bool IsEnd()
