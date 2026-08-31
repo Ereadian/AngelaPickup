@@ -2,7 +2,6 @@ namespace ereadian.builder.UnitTest;
 
 using System.Text;
 using System.Web;
-using ereadian.builder.html;
 using ereadian.builder.html.Nodes;
 
 [TestClass]
@@ -17,11 +16,12 @@ public sealed class AttributeNodeUnitTest
         string data = $"'{TestUtility.CreateUniqueName("data")}'";
 
         // Act
-        AttributeNode actual = new(name, data);
+        AttributeNode attribute = new(name, data);
 
         // Assert
-        Assert.AreEqual(name, actual.Name);
-        Assert.AreEqual(data, actual.Data);
+        Assert.AreEqual(name, attribute.Name);
+        Assert.AreEqual(data, attribute.Data);
+        Assert.AreEqual(NodeType.Attribute, attribute.NodeType);
     }
 
     [TestMethod]
@@ -50,7 +50,7 @@ public sealed class AttributeNodeUnitTest
 
         // Act
         AttributeNode attribute = new(name, data);
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new();
         Dictionary<string, object> variables = new();
         attribute.Render(builder, variables);
 
