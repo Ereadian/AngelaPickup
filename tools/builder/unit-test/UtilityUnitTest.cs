@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using ereadian.builder.html;
 using ereadian.builder.html.Nodes;
@@ -63,7 +64,7 @@ public sealed class UtilityUnitTest
     public void Utility_GetAttributeValue_NotFoundReturnEmpty()
     {
         // Arrange
-        List<AttributeNode> attributes = [ new AttributeNode("name", "'Value'") ];
+        List<AttributeNode> attributes = [new AttributeNode("name", "'Value'")];
 
         // Act
         string actual = Utility.GetAttributeValue(attributes, "unknown");
@@ -145,6 +146,87 @@ public sealed class UtilityUnitTest
         // Asset
         Assert.IsEmpty(nodes);
         Assert.AreEqual(name, context.Variables[VariableNames.TemplateName]);
+    }
+
+    [TestMethod]
+    public void Utility_LoadNodes_SingleBuildNode_ReturnExpected()
+    {
+        // Arrange
+        List<string> buildNames = BuildActions.Actions.Keys.ToList();
+        IReadOnlyList<IHtmlNode>[] allNodes = new IReadOnlyList<IHtmlNode>[buildNames.Count];
+
+        // Act
+        for (int i = 0; i < buildNames.Count; i++)
+        {
+            string content = $"<build name='{buildNames[i]}' />";
+            HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, true);
+            allNodes[i] = Utility.LoadNodes(context);
+        }
+
+        // Assert
+        for (int i = 0; i < buildNames.Count; i++)
+        {
+            IReadOnlyList<IHtmlNode> nodes = allNodes[i];
+            Assert.HasCount(1, nodes);
+            Assert.IsInstanceOfType<DynamicNode>(nodes[0]);
+        }
+    }
+
+    [TestMethod]
+    public void Utility_LoadNodes_NestedElementNodes_ReturnExpected()
+    {
+        // Arrange
+        Random random = Random.Shared;
+        int depth = random.Next(2, 5);
+        int width = random.Next(2, 5);
+        int attributeCount = random.Next(5, 10);
+        StringBuilder builder = new();
+        List<IHtmlNode> expected = CreateElements(builder, depth, width, attributeCount);
+
+        // Act
+        HtmlParserContext context = TestUtility.CreateContext(Random.Shared, builder.ToString(), true);
+        IReadOnlyList<IHtmlNode> actual = Utility.LoadNodes(context);
+
+        // Assert
+        Assert.IsTrue(TestUtility.AreNodeListsEqual(expected, actual));
+    }
+
+    private static List<IHtmlNode> CreateElements(StringBuilder builder, int layerId, int childCount, int attributeCount)
+    {
+        List<IHtmlNode> nodes = [];
+        for (int i = 0; i < childCount; i++)
+        {
+            nodes.Add(CreateElement(builder, layerId, i, childCount, attributeCount));
+        }
+
+        return nodes;
+    }
+
+    private static ElementNode CreateElement(StringBuilder builder, int layerId, int siblingId, int childCount, int attributeCount)
+    {
+        string elementName = TestUtility.CreateUniqueName($"Element_{layerId}_{siblingId}");
+        _ = builder.Append('<').Append(elementName);
+        List<AttributeNode> attributeNodes = [];
+        for (int i = 0; i < attributeCount; i++)
+        {
+            string suffix = $"{layerId}_{siblingId}_{i}";
+            string attributeName = TestUtility.CreateUniqueName($"attribute_name_{suffix}");
+            string attributeValue = TestUtility.CreateUniqueName($"attribute_value_{suffix}");
+            string attributeData = $"'{attributeValue}'";
+            _ = builder.Append($" {attributeName}={attributeData}");
+            attributeNodes.Add(new AttributeNode(attributeName, attributeData));
+        }
+
+        if (--layerId < 0)
+        {
+            _ = builder.Append(" />");
+            return new ElementNode(elementName, attributeNodes, [], true);
+        }
+
+        _ = builder.Append('>');
+        List<IHtmlNode> children = CreateElements(builder, layerId, childCount, attributeCount);
+        _ = builder.Append("</").Append(elementName).Append('>');
+        return new ElementNode(elementName, attributeNodes, children, false);
     }
 
     private class NodeForTest(string name, string content) : IHtmlNode

@@ -95,13 +95,13 @@ public class ElementNode(
 
         context.SkipWhiteSpace();
         const string ElementCloseTag = "</";
-        if (context.IsEnd() || !context.StartsWith(ElementShortCloseTag))
+        if (context.IsEnd() || !context.StartsWith(ElementCloseTag))
         {
             throw new InvalidDataException(
                 $"Expect end element close tag '{ElementCloseTag}' but it does not. File:'{context.FullPath}. Content:\n{context.Content[context.CurrentPosition..]}");
         }
 
-        context.CurrentPosition += ElementShortCloseTag.Length;
+        context.CurrentPosition += ElementCloseTag.Length;
         context.SkipWhiteSpace();
         string endTagName = context.GetName();
         if (endTagName != tagName)

@@ -7,6 +7,7 @@ public class DynamicNode(
     Action<ElementNode, StringBuilder, IDictionary<string, object>> buildAction) : IHtmlNode
 {
     public NodeType NodeType => NodeType.Dynamic;
+    public ElementNode Element => elementNode;
 
     public void Render(in StringBuilder builder, in IDictionary<string, object> variables)
     {
