@@ -4,7 +4,7 @@ public static class DictionaryExtension
 {
     extension<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
     {
-        public void Add(IDictionary<TKey, TValue> source)
+        public void Append(IDictionary<TKey, TValue> source)
         {
             foreach(var pair in source)
             {
@@ -15,7 +15,7 @@ public static class DictionaryExtension
             }
         }
 
-        public void Add(IReadOnlyDictionary<TKey, TValue> source)
+        public void AppendReadOnly(IReadOnlyDictionary<TKey, TValue> source)
         {
             foreach(var pair in source)
             {

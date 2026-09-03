@@ -4,6 +4,7 @@ public static class VariableNames
 {
     public const string SiteCulture = "site-culture";
     public const string SiteBuildTime = "site-build-time";
+    public const string OutputRootFolder = "output-root-folder";
     public const string CurrentFolder = "current-folder";
     public const string CurrentSourceFileFullPath = "current-file_full_path";
     public const string CurrentFileName = "current-file-name";
@@ -13,4 +14,5 @@ public static class VariableNames
     public const string TemplateFolder = "template-folder";
     public const string TemplateName = "template-name";
     public const string TemplateCollection = "templates";
+    public const string currentHtmlToRender = "current-html-to-render";
 }

@@ -2,18 +2,12 @@ namespace ereadian.builder.html.Nodes;
 
 using System.Text;
 
-public class HtmlFile : INodeCollection
+public class HtmlFile : HtmlFileBase
 {
-    public HtmlFile(string fullPath, string folder, bool allowComment)
+    public HtmlFile(string fullPath, string folder, bool allowComment) : base(fullPath, folder, allowComment)
     {
-        HtmlParserContext context = new (fullPath, folder, allowComment);
-        this.Nodes = Utility.LoadNodes(context);
-
-        Dictionary<string, object> variables = context.Variables;
-        this.Variables = variables;
-
         string? templateName = null;
-        if (variables.TryGetValue(VariableNames.TemplateName, out object? value))
+        if (this.Variables.TryGetValue(VariableNames.TemplateName, out object? value))
         {
             templateName = value as string;
         }
@@ -21,17 +15,54 @@ public class HtmlFile : INodeCollection
         this.TemplateName = templateName is null ? string.Empty : templateName.Trim();
     }
 
-    public string TemplateName {get;}
-    public Dictionary<string, object> Variables {get;}
-    public IReadOnlyList<IHtmlNode> Nodes {get;}
+    public string TemplateName { get; }
 
-    public NodeType NodeType => NodeType.File;
-
-    public void Render(in StringBuilder builder, in IDictionary<string, object> variables)
+    public void Render(in IDictionary<string, object> globalVariables)
     {
-        foreach(IHtmlNode node in this.Nodes)
+        StringBuilder builder = new(4196);
+        Dictionary<string, object> variables = new(globalVariables);
+        variables.Append(this.Variables);
+
+
+        if (string.IsNullOrEmpty(this.TemplateName))
         {
-            node.Render(builder, variables);
+            this.Render(builder, variables);
         }
+        else
+        {
+            Dictionary<string, HtmlTemplate> templates;
+            if (globalVariables.TryGetValue(VariableNames.TemplateCollection, out object? rawTemplates))
+            {
+                templates = (Dictionary<string, HtmlTemplate>)rawTemplates;
+            }
+            else
+            {
+                templates = new Dictionary<string, HtmlTemplate>();
+                globalVariables.Add(VariableNames.TemplateCollection, templates);
+            }
+
+            if (templates.TryGetValue(this.TemplateName, out HtmlTemplate? template) || (template is null))
+            {
+                string templateFolder = (string)globalVariables[VariableNames.TemplateFolder];
+                template = new HtmlTemplate(Path.Combine(templateFolder, $"{this.TemplateName}.html"), templateFolder, this.AllowComment);
+                templates[this.TemplateName] = template;
+            }
+
+            variables.Append(template.Variables);
+            variables[VariableNames.currentHtmlToRender] = this;
+            template.Render(builder, variables);
+        }
+
+        string outputRootFolder = (string)variables[VariableNames.OutputRootFolder];
+        string relativeFolder = (string)variables[VariableNames.CurrentFolder];
+        string fileName = (string)Variables[VariableNames.CurrentFileName];
+        string outputFolder = Path.Combine(outputRootFolder, relativeFolder);
+        if (!Directory.Exists(outputFolder))
+        {
+            Directory.CreateDirectory(outputFolder);
+        }
+
+        string outputFullPath = Path.GetFullPath(Path.Combine(outputFolder, fileName));
+        File.WriteAllText(outputFullPath, builder.ToString());
     }
 }
