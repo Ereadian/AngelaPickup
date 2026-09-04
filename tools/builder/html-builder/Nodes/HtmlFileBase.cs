@@ -2,7 +2,7 @@ namespace ereadian.builder.html.Nodes;
 
 using System.Text;
 
-public abstract class HtmlFileBase : INodeCollection
+public class HtmlFileBase : INodeCollection
 {
     public HtmlFileBase(string fullPath, string folder, bool allowComment)
     {
@@ -20,7 +20,7 @@ public abstract class HtmlFileBase : INodeCollection
 
     public NodeType NodeType => NodeType.File;
 
-    protected bool AllowComment {get;}
+    public bool AllowComment {get;}
 
     public virtual void Render(in StringBuilder builder, in IDictionary<string, object> variables)
     {
