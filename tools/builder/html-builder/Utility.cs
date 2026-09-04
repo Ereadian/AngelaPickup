@@ -112,18 +112,17 @@ public static class Utility
                     context.Variables[VariableNames.TemplateName] = templateName;
                     break;
                 case "build":
-                    const string BuildNameAttributeName = "name";
-                    string buildName = GetAttributeValue(elementNode.Attributes, BuildNameAttributeName);
-                    if (string.IsNullOrEmpty(buildName))
+                    string buildTypeName = GetAttributeValue(elementNode.Attributes, BuildActions.BuildTypeAttributeName);
+                    if (string.IsNullOrEmpty(buildTypeName))
                     {
                         throw new InvalidDataException(
-                            $"Build element requires '{BuildNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                            $"Build element requires '{BuildActions.BuildTypeAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
                     }
 
-                    if (!BuildActions.Actions.TryGetValue(buildName, out var buildAction))
+                    if (!BuildActions.Actions.TryGetValue(buildTypeName, out var buildAction))
                     {
                         throw new InvalidDataException(
-                            $"Unknown build action name '{buildName}'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                            $"Unknown build action name '{buildTypeName}'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
                     }
 
                     DynamicNode dynamicNode = new (elementNode, buildAction);
@@ -141,6 +140,20 @@ public static class Utility
     public static string GetAttributeValue(IReadOnlyList<AttributeNode> attributeNodes, string name)
     {
         return attributeNodes.FirstOrDefault(attribute => attribute.Name == name)?.Value ?? string.Empty;
+    }
+
+    public static IReadOnlyList<ElementNode> GetElementNodes(IReadOnlyList<IHtmlNode> nodes)
+    {
+        List<ElementNode> elements = new(nodes.Count);
+        foreach(IHtmlNode node in nodes)
+        {
+            if (node.NodeType == NodeType.Element)
+            {
+                elements.Add((ElementNode)node);
+            }
+        }
+
+        return elements;
     }
 
     private static LiteratureNode CreateMarkNode(HtmlParserContext context, string openTag, string closeTag)

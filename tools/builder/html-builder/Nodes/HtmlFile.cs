@@ -48,8 +48,23 @@ public class HtmlFile : HtmlFileBase
                 templates[this.TemplateName] = template;
             }
 
+            Dictionary<string, ElementNode> elementMapping = [];
+            ElementNode? htmlElement = Utility.GetElementNodes(this.Nodes).FirstOrDefault(element => element.Name == "html");
+            if (htmlElement != null)
+            {
+                IReadOnlyList<ElementNode> rootElements = Utility.GetElementNodes(htmlElement.Children);
+                foreach(ElementNode element in rootElements)
+                {
+                    if (!elementMapping.ContainsKey(element.Name))
+                    {
+                        elementMapping.Add(element.Name, element);
+                    }
+                }
+            }
+
+
+            variables[VariableNames.RootElementsToInject] = this;
             variables.Append(template.Variables);
-            variables[VariableNames.currentHtmlToRender] = this;
             template.Render(builder, variables);
         }
 

@@ -14,5 +14,5 @@ public static class VariableNames
     public const string TemplateFolder = "template-folder";
     public const string TemplateName = "template-name";
     public const string TemplateCollection = "templates";
-    public const string currentHtmlToRender = "current-html-to-render";
+    public const string RootElementsToInject = "root-elements-to-inject";
 }

@@ -158,7 +158,7 @@ public sealed class UtilityUnitTest
         // Act
         for (int i = 0; i < buildNames.Count; i++)
         {
-            string content = $"<build name='{buildNames[i]}' />";
+            string content = $"<build {BuildActions.BuildTypeAttributeName}='{buildNames[i]}' />";
             HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, true);
             allNodes[i] = Utility.LoadNodes(context);
         }
