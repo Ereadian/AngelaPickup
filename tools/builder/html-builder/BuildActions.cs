@@ -69,7 +69,7 @@ public static class BuildActions
             {
                 foreach(ElementNode element in elements)
                 {
-                    if ((elementName.Length < 1) || (elementName == (Utility.GetAttributeValue(element.Attributes, "name").Trim())))
+                    if ((elementName.Length < 1) || (elementName == Utility.GetAttributeValue(element.Attributes, "name").Trim()))
                     {
                         Utility.RenderNodes(element.Children, builder, variables);
                     }

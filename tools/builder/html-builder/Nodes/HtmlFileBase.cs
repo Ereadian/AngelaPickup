@@ -18,7 +18,7 @@ public class HtmlFileBase : INodeCollection
     public Dictionary<string, object> Variables {get;}
     public IReadOnlyList<IHtmlNode> Nodes {get;}
 
-    public NodeType NodeType => NodeType.File;
+    public virtual NodeType NodeType => NodeType.File;
 
     public bool AllowComment {get;}
 

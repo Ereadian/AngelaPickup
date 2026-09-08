@@ -7,4 +7,6 @@ public class HtmlTemplate : HtmlFileBase
     public HtmlTemplate(string fullPath, string folder, bool allowComment) : base(fullPath, folder, allowComment)
     {
     }
+
+    public override NodeType NodeType =>  NodeType.Template;
 }

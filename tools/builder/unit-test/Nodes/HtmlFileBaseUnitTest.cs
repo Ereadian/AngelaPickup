@@ -1,7 +1,7 @@
 namespace ereadian.builder.UnitTest;
 
 using System.Text;
-using ereadian.builder.html;
+using System.Web;
 using ereadian.builder.html.Nodes;
 
 [TestClass]
@@ -39,5 +39,36 @@ public sealed class HtmlFileBaseUnitTest
         // Assert
         Assert.AreEqual(allowComment, fileBase.AllowComment);
         Assert.IsTrue(TestUtility.AreNodeListsEqual(expected, fileBase.Nodes));
+    }
+
+    [TestMethod]
+    public void HtmlFileBase_Render_ReturnExpected()
+    {
+        // Arrange
+        Random random = Random.Shared;
+        int elementCount = random.Next(5, 10);
+        StringBuilder builder = new();
+
+        for (int i = 0; i < elementCount; i++)
+        {
+
+            string name = TestUtility.CreateUniqueName($"element{i}");
+            string content = TestUtility.CreateUniqueName($"content{i}");
+            _ = builder.Append('<').Append(name).Append('>').Append(HttpUtility.HtmlEncode(content)).Append("</").Append(name).Append('>');
+        }
+
+        string folderName = TestUtility.CreateUniqueName("TestFolder");
+        using TemporaryFolder temporaryFolder = new(folderName);
+        string fileName = $"{TestUtility.CreateUniqueName("file")}.html";
+        string fullPath = Path.Combine(temporaryFolder.FullPath, fileName);
+        File.WriteAllText(fullPath, builder.ToString());
+
+        // Act
+        HtmlFileBase fileBase = new(fullPath, folderName, true);
+        StringBuilder actual = new();
+        fileBase.Render(actual, new Dictionary<string, object>());
+
+        // Assert
+        Assert.AreEqual(builder.ToString(), actual.ToString());
     }
 }
