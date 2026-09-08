@@ -1,6 +1,5 @@
 ﻿namespace ereadian.builder.site;
 
-using System.Globalization;
 using System.Reflection;
 using ereadian.builder.html;
 
@@ -39,7 +38,7 @@ internal class Program
         Console.WriteLine("\tTarget: {0}", targetFolder);
         Console.WriteLine("\tTemplate: {0}", templateFolder);
         Console.WriteLine("\tCulture: {0}", transformer.SiteCultureInfo.DisplayName);
-        Process(transformer, sourceFolder, targetFolder, string.Empty, string.Empty);
+        Process(transformer, sourceFolder, targetFolder, string.Empty);
         Console.WriteLine("Build completed.");
         return 0;
     }
@@ -48,12 +47,11 @@ internal class Program
         Transformer transformer,
         string sourceRootFolder,
         string targetRootFolder,
-        string sourceFolder,
-        string targetFolder)
+        string relativePath)
     {
-        string finalSourceFolder = GetPath(sourceRootFolder, sourceFolder);
-        string finalTargetFolder = PrepareFolder(targetRootFolder, targetFolder);
-        Console.WriteLine("Process folder: '{0}' => '{1}'", sourceFolder, targetFolder);
+        string finalSourceFolder = GetPath(sourceRootFolder, relativePath);
+        string finalTargetFolder = PrepareFolder(targetRootFolder, relativePath);
+        Console.WriteLine("Process folder: '{0}'", relativePath);
         foreach (string fileFullPath in Directory.GetFiles(finalSourceFolder))
         {
             string fileName = Path.GetFileName(fileFullPath);
@@ -67,11 +65,17 @@ internal class Program
             else
             {
                 Console.Write("\t process {0}", fileName);
-                string finalHtml = transformer.ProcessFile(fileFullPath, sourceFolder);
+                string finalHtml = transformer.ProcessFile(fileFullPath, relativePath);
                 File.WriteAllText(finalTargetFileName, finalHtml);
             }
 
             Console.WriteLine(" done");
+        }
+
+        foreach(string subFolderFullPath in Directory.GetDirectories(finalSourceFolder))
+        {
+            string folderName = Path.GetFileName(subFolderFullPath);
+            Process(transformer, sourceRootFolder, targetRootFolder, Path.Combine(relativePath, folderName));
         }
     }
 
