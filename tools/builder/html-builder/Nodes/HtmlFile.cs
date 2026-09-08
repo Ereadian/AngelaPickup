@@ -65,7 +65,7 @@ public class HtmlFile : HtmlFileBase
                 }
             }
 
-            variables[VariableNames.RootElementsToInject] = this;
+            variables[VariableNames.RootElementsToInject] = elementMapping;
             variables.Append(template.Variables);
             template.Render(builder, variables);
         }
