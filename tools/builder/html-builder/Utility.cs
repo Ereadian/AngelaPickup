@@ -111,7 +111,7 @@ public static class Utility
 
                     context.Variables[VariableNames.TemplateName] = templateName;
                     break;
-                case "build":
+                case BuildActions.BuildElementName:
                     string buildTypeName = GetAttributeValue(elementNode.Attributes, BuildActions.BuildTypeAttributeName);
                     if (string.IsNullOrEmpty(buildTypeName))
                     {

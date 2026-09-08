@@ -6,6 +6,7 @@ using ereadian.builder.html.Nodes;
 
 public static class BuildActions
 {
+    public const string BuildElementName = "build";
     public const string BuildTypeAttributeName = "type";
 
     public static IReadOnlyDictionary<string, Action<ElementNode, StringBuilder, IDictionary<string, object>>> Actions
@@ -44,7 +45,8 @@ public static class BuildActions
     /// <param name="variables">the render variables.</param>
     /// <example>
     /// <![CDATA[
-    /// <build type = "InjectHtmlElement" name="body" />
+    /// <build type = "InjectHtmlElement" tag="header" />
+    /// <build type = "InjectHtmlElement" tag="content" name="foot" />
     /// ]]>
     /// </example>
     public static void InjectHtmlElement(
@@ -52,18 +54,26 @@ public static class BuildActions
         StringBuilder builder,
         IDictionary<string, object> variables)
     {
-        string? elementName = Utility.GetAttributeValue(elementNode.Attributes, "name");
-        if (string.IsNullOrEmpty(elementName?.Trim()))
+        string elementTag = Utility.GetAttributeValue(elementNode.Attributes, "tag").Trim();
+        if (string.IsNullOrEmpty(elementTag))
         {
             return;
         }
 
+        string elementName = Utility.GetAttributeValue(elementNode.Attributes, "name").Trim();
+
         if (variables.TryGetValue(VariableNames.RootElementsToInject, out object? rowMapping))
         {
-            Dictionary<string, ElementNode> elementMapping = (Dictionary<string, ElementNode>)rowMapping;
-            if (elementMapping.TryGetValue(elementName, out ElementNode? element))
+            Dictionary<string, List<ElementNode>> elementMapping = (Dictionary<string, List<ElementNode>>)rowMapping;
+            if (elementMapping.TryGetValue(elementTag, out List<ElementNode>? elements))
             {
-                Utility.RenderNodes(element.Children, builder, variables);
+                foreach(ElementNode element in elements)
+                {
+                    if ((elementName.Length < 1) || (elementName == (Utility.GetAttributeValue(element.Attributes, "name").Trim())))
+                    {
+                        Utility.RenderNodes(element.Children, builder, variables);
+                    }
+                }
             }
         }
     }
