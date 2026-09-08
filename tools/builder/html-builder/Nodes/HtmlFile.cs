@@ -17,7 +17,7 @@ public class HtmlFile : HtmlFileBase
 
     public string TemplateName { get; }
 
-    public void Render(in IDictionary<string, object> globalVariables)
+    public string Render(in IDictionary<string, object> globalVariables)
     {
         StringBuilder builder = new(4196);
         Dictionary<string, object> variables = new(globalVariables);
@@ -70,6 +70,7 @@ public class HtmlFile : HtmlFileBase
             template.Render(builder, variables);
         }
 
+        /*
         string outputRootFolder = (string)variables[VariableNames.OutputRootFolder];
         string relativeFolder = (string)variables[VariableNames.CurrentFolder];
         string fileName = (string)Variables[VariableNames.CurrentFileName];
@@ -81,5 +82,8 @@ public class HtmlFile : HtmlFileBase
 
         string outputFullPath = Path.GetFullPath(Path.Combine(outputFolder, fileName));
         File.WriteAllText(outputFullPath, builder.ToString());
+        */
+
+        return builder.ToString();
     }
 }

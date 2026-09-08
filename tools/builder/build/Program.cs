@@ -7,8 +7,8 @@ using ereadian.builder.html;
 internal class Program
 {
     private const string DefaultSourceFolder = "docs";
-    private const string DefaultTargetFolder = "page-output";
-    private const string TemplateFolder = "templates";
+    private const string DefaultOutputFolder = "page-output";
+    private const string DefaultTemplateFolder = "templates";
     private const string HtmlFileExtension = ".html";
 
     private static readonly string RepositoryRootFolder;
@@ -30,12 +30,14 @@ internal class Program
     internal static int Main(string[] arguments)
     {
         string sourceFolder = arguments.Length < 1 ? GetRepositorySubFolder(DefaultSourceFolder) : Path.GetFullPath(arguments[0]);
-        string targetFolder = arguments.Length < 2 ? GetRepositorySubFolder(DefaultTargetFolder) : Path.GetFullPath(arguments[1]);
+        string targetFolder = arguments.Length < 2 ? GetRepositorySubFolder(DefaultOutputFolder) : Path.GetFullPath(arguments[1]);
+        string templateFolder = arguments.Length < 3 ? GetRepositorySubFolder(DefaultTemplateFolder) : Path.GetFullPath(arguments[2]);
 
-        Transformer transformer = new(GetRepositorySubFolder(TemplateFolder), new CultureInfo("zh-Hans"));
+        Transformer transformer = new(targetFolder, templateFolder, "zh-Hans", false);
         Console.WriteLine("Start building.");
         Console.WriteLine("\tSource: {0}", sourceFolder);
         Console.WriteLine("\tTarget: {0}", targetFolder);
+        Console.WriteLine("\tTemplate: {0}", templateFolder);
         Console.WriteLine("\tCulture: {0}", transformer.SiteCultureInfo.DisplayName);
         Process(transformer, sourceFolder, targetFolder, string.Empty, string.Empty);
         Console.WriteLine("Build completed.");
@@ -73,19 +75,19 @@ internal class Program
         }
     }
 
-    private static string GetPath(string rootPath, string folder)
-    {
-        return Path.GetFullPath(Path.Combine(rootPath, folder));
-    }
-
     private static string GetRepositorySubFolder(string folder)
     {
         return GetPath(RepositoryRootFolder, folder);
     }
 
+    private static string GetPath(string rootPath, string folder)
+    {
+        return string.IsNullOrEmpty(folder) ? rootPath : Path.GetFullPath(Path.Combine(rootPath, folder));
+    }
+
     private static string PrepareFolder(string rootFolder, string subFolder)
     {
-        string targetFolder = string.IsNullOrEmpty(subFolder) ? rootFolder : GetPath(rootFolder, subFolder);
+        string targetFolder = GetPath(rootFolder, subFolder);
         if (!Directory.Exists(targetFolder))
         {
             Directory.CreateDirectory(targetFolder);

@@ -108,12 +108,9 @@ public sealed class HtmlFileUnitTest
             {VariableNames.OutputRootFolder, targetRootFolder },
         };
 
-        file.Render(globalVariables);
+        string actual = file.Render(globalVariables);
 
         // Assert
-        string targetFullPath = Path.Combine(targetRootFolder, currentFolder, fileName);
-        Assert.IsTrue(File.Exists(targetFullPath));
-        string actual = File.ReadAllText(targetFullPath);
         Assert.AreEqual(builder.ToString(), actual);
     }
 
@@ -192,14 +189,10 @@ public sealed class HtmlFileUnitTest
             {VariableNames.TemplateFolder, templateFolder},
         };
 
-        file.Render(globalVariables);
+        string actual = file.Render(globalVariables);
 
         // Assert
         Assert.AreEqual(templateName, file.TemplateName);
-
-        string targetFullPath = Path.Combine(targetRootFolder, currentFolder, fileName);
-        Assert.IsTrue(File.Exists(targetFullPath));
-        string actual = File.ReadAllText(targetFullPath);
         Assert.AreEqual(expectedHtmlBuilder.ToString(), actual);
     }
 }

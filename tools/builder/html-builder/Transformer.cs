@@ -6,19 +6,22 @@ using ereadian.builder.html.Nodes;
 public class Transformer
 {
     private readonly Dictionary<string, object> globalVariables; 
+    private readonly bool allowComment;
 
-    public Transformer(string templateFolder, string siteCultureName)
-        : this(templateFolder, CultureInfo.GetCultureInfo(siteCultureName))
+    public Transformer(string outputRootFolder, string templateFolder, string siteCultureName, bool allowComment)
+        : this(outputRootFolder, templateFolder, CultureInfo.GetCultureInfo(siteCultureName), allowComment)
     {
     }
 
-    public Transformer(string templateFolder, CultureInfo cultureInfo)
+    public Transformer(string outputRootFolder, string templateFolder, CultureInfo cultureInfo, bool allowComment)
     {
         this.SiteCultureInfo = cultureInfo;
+        this.allowComment = allowComment;
         this.globalVariables = new()
         {
+            {VariableNames.OutputRootFolder, outputRootFolder },
             {VariableNames.TemplateFolder, templateFolder },
-            {VariableNames.TemplateCollection, new Dictionary<string, HtmlFile>() },
+            {VariableNames.TemplateCollection, new Dictionary<string, HtmlTemplate>() },
             {VariableNames.SiteCulture, cultureInfo },
             {VariableNames.SiteBuildTime, DateTime.UtcNow },
         };
@@ -26,13 +29,9 @@ public class Transformer
 
     public CultureInfo SiteCultureInfo {get;}
 
-    public string Process(string sourceContent)
-    {
-        return sourceContent;
-    }
-
     public string ProcessFile(string fullPath, string folder)
     {
-        return this.Process(File.ReadAllText(fullPath));
+        HtmlFile file = new HtmlFile(fullPath, folder, this.allowComment);
+        return file.Render(this.globalVariables);
     }
 }
