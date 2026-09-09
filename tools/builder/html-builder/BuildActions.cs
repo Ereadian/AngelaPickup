@@ -13,6 +13,7 @@ public static class BuildActions
         => new Dictionary<string, Action<ElementNode, StringBuilder, IDictionary<string, object>>>()
         {
             {nameof(RenderSiteBuildTime), RenderSiteBuildTime},
+            {nameof(RenderDateTime), RenderDateTime},
             {nameof(InjectHtmlElement), InjectHtmlElement},
         };
 
@@ -35,6 +36,33 @@ public static class BuildActions
         DateTime siteBuildTime = (DateTime)variables[VariableNames.SiteBuildTime];
         string value = siteBuildTime.ToString(variables[VariableNames.SiteCulture] as CultureInfo);
         _ = builder.Append(value);
+    }
+
+    /// <summary>
+    /// Render date time where the data is stored in variable collection.
+    /// </summary>
+    /// <param name="elementNode">the element contains the details.</param>
+    /// <param name="builder">the string builder.</param>
+    /// <param name="variables">the render variables.</param>
+    /// <example>
+    /// <![CDATA[
+    /// <build type="RenderDateTime" name='current-file-modified-time' />
+    /// ]]>
+    /// </example>
+    public static void RenderDateTime(
+        ElementNode elementNode,
+        StringBuilder builder,
+        IDictionary<string, object> variables)
+    {
+        string variableName = Utility.GetAttributeValue(elementNode.Attributes, "name").Trim();
+        if ((variableName.Length < 1) || !variables.TryGetValue(variableName, out object? value))
+        {
+            return;
+        }
+
+        DateTime time = (DateTime)value;
+        CultureInfo siteCultureInfo = (CultureInfo)variables[VariableNames.SiteCulture];
+        _ = builder.Append(time.ToString(siteCultureInfo));
     }
 
     /// <summary>
