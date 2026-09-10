@@ -80,7 +80,7 @@ public sealed class UtilityUnitTest
         HtmlParserContext context = TestUtility.CreateContext(Random.Shared, string.Empty);
 
         // Act
-        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context);
+        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         Assert.IsEmpty(nodes);
@@ -99,7 +99,7 @@ public sealed class UtilityUnitTest
         HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, allowComment);
 
         // Act
-        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context);
+        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         if (generated)
@@ -125,7 +125,7 @@ public sealed class UtilityUnitTest
         HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, true);
 
         // Act
-        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context);
+        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context, TestUtility.CreateUniqueName("shared"), []);
 
         // Asset
         Assert.IsEmpty(nodes);
@@ -141,7 +141,7 @@ public sealed class UtilityUnitTest
         HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, true);
 
         // Act
-        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context);
+        IReadOnlyList<IHtmlNode> nodes = Utility.LoadNodes(context, TestUtility.CreateUniqueName("shared"), []);
 
         // Asset
         Assert.IsEmpty(nodes);
@@ -160,7 +160,7 @@ public sealed class UtilityUnitTest
         {
             string content = $"<build {BuildActions.BuildTypeAttributeName}='{buildNames[i]}' />";
             HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content, true);
-            allNodes[i] = Utility.LoadNodes(context);
+            allNodes[i] = Utility.LoadNodes(context, TestUtility.CreateUniqueName("shared"), []);
         }
 
         // Assert
@@ -185,7 +185,7 @@ public sealed class UtilityUnitTest
 
         // Act
         HtmlParserContext context = TestUtility.CreateContext(Random.Shared, builder.ToString(), true);
-        IReadOnlyList<IHtmlNode> actual = Utility.LoadNodes(context);
+        IReadOnlyList<IHtmlNode> actual = Utility.LoadNodes(context, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         Assert.IsTrue(TestUtility.AreNodeListsEqual(expected, actual));

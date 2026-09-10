@@ -2,18 +2,20 @@
 
 using System.Reflection;
 using ereadian.builder.html;
+using ereadian.builder.html.Nodes;
 
 internal class Program
 {
     private const string DefaultSourceFolder = "docs";
     private const string DefaultOutputFolder = "page-output";
     private const string DefaultTemplateFolder = "templates";
+    private const string DefaultSharedContentFolder = "shared";
     private const string HtmlFileExtension = ".html";
 
     private static readonly string RepositoryRootFolder;
 
 #if DEBUG
-    private const bool EnableOverride = true;    
+    private const bool EnableOverride = true;
 #else
     private const bool EnableOverride = false;    
 #endif
@@ -31,6 +33,7 @@ internal class Program
         string sourceFolder = arguments.Length < 1 ? GetRepositorySubFolder(DefaultSourceFolder) : Path.GetFullPath(arguments[0]);
         string targetFolder = arguments.Length < 2 ? GetRepositorySubFolder(DefaultOutputFolder) : Path.GetFullPath(arguments[1]);
         string templateFolder = arguments.Length < 3 ? GetRepositorySubFolder(DefaultTemplateFolder) : Path.GetFullPath(arguments[2]);
+        string sharedFolder = arguments.Length < 4 ? GetRepositorySubFolder(DefaultSharedContentFolder) : Path.GetFullPath(arguments[3]);
 
         Transformer transformer = new(targetFolder, templateFolder, "zh-Hans", false);
         Console.WriteLine("Start building.");
@@ -38,7 +41,8 @@ internal class Program
         Console.WriteLine("\tTarget: {0}", targetFolder);
         Console.WriteLine("\tTemplate: {0}", templateFolder);
         Console.WriteLine("\tCulture: {0}", transformer.SiteCultureInfo.DisplayName);
-        Process(transformer, sourceFolder, targetFolder, string.Empty);
+        Dictionary<string, List<IHtmlNode>> sharedContents = [];
+        Process(transformer, sourceFolder, targetFolder, string.Empty ,sharedFolder, sharedContents);
         Console.WriteLine("Build completed.");
         return 0;
     }
@@ -47,7 +51,9 @@ internal class Program
         Transformer transformer,
         string sourceRootFolder,
         string targetRootFolder,
-        string relativePath)
+        string relativePath,
+        string sharedFolder,
+        Dictionary<string, List<IHtmlNode>> sharedContents)
     {
         string finalSourceFolder = GetPath(sourceRootFolder, relativePath);
         string finalTargetFolder = PrepareFolder(targetRootFolder, relativePath);
@@ -65,17 +71,23 @@ internal class Program
             else
             {
                 Console.Write("\t process {0}", fileName);
-                string finalHtml = transformer.ProcessFile(fileFullPath, relativePath);
+                string finalHtml = transformer.ProcessFile(fileFullPath, relativePath, sharedFolder, sharedContents);
                 File.WriteAllText(finalTargetFileName, finalHtml);
             }
 
             Console.WriteLine(" done");
         }
 
-        foreach(string subFolderFullPath in Directory.GetDirectories(finalSourceFolder))
+        foreach (string subFolderFullPath in Directory.GetDirectories(finalSourceFolder))
         {
             string folderName = Path.GetFileName(subFolderFullPath);
-            Process(transformer, sourceRootFolder, targetRootFolder, Path.Combine(relativePath, folderName));
+            Process(
+                transformer,
+                sourceRootFolder,
+                targetRootFolder,
+                Path.Combine(relativePath, folderName),
+                sharedFolder,
+                sharedContents);
         }
     }
 

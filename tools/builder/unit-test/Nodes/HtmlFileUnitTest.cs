@@ -34,7 +34,7 @@ public sealed class HtmlFileUnitTest
         File.WriteAllText(fullPath, builder.ToString());
 
         // Act
-        HtmlFile file = new(fullPath, folderName, allowComment);
+        HtmlFile file = new(fullPath, folderName, allowComment, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         Assert.AreEqual(allowComment, file.AllowComment);
@@ -66,7 +66,7 @@ public sealed class HtmlFileUnitTest
         File.WriteAllText(fullPath, builder.ToString());
 
         // Act
-        HtmlFile file = new(fullPath, folderName, true);
+        HtmlFile file = new(fullPath, folderName, true, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         Assert.AreEqual(requestTemplate ? templateName : string.Empty, file.TemplateName);
@@ -100,7 +100,7 @@ public sealed class HtmlFileUnitTest
         string sourceFullPath = Path.Combine(sourceRootFolder, currentFolder, fileName);
         File.WriteAllText(sourceFullPath, builder.ToString());
 
-        HtmlFile file = new(sourceFullPath, currentFolder, true);
+        HtmlFile file = new(sourceFullPath, currentFolder, true, TestUtility.CreateUniqueName("shared"), []);
 
         // Act
         Dictionary<string, object> globalVariables = new()
@@ -180,7 +180,7 @@ public sealed class HtmlFileUnitTest
         string targetRootFolder = Path.Combine(temporaryFolder.FullPath, TestUtility.CreateUniqueName("target"));
         Directory.CreateDirectory(targetRootFolder);
 
-        HtmlFile file = new(sourceFullPath, currentFolder, true);
+        HtmlFile file = new(sourceFullPath, currentFolder, true, TestUtility.CreateUniqueName("shared"), []);
 
         // Act
         Dictionary<string, object> globalVariables = new()

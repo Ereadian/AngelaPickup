@@ -15,7 +15,7 @@ public class ElementNode(
     public IReadOnlyList<AttributeNode> Attributes => attributes;
     public IReadOnlyList<IHtmlNode> Children => children;
 
-    public static ElementNode Parse(HtmlParserContext context)
+    public static ElementNode Parse(HtmlParserContext context, string sharedFolder, Dictionary<string, List<IHtmlNode>> sharedContents)
     {
         if (context.GetCurrentChar() != '<')
         {
@@ -91,7 +91,7 @@ public class ElementNode(
         }
 
         context.CurrentPosition++;
-        IReadOnlyList<IHtmlNode> children = Utility.LoadNodes(context);
+        IReadOnlyList<IHtmlNode> children = Utility.LoadNodes(context, sharedFolder, sharedContents);
 
         context.SkipWhiteSpace();
         const string ElementCloseTag = "</";

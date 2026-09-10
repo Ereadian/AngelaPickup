@@ -16,7 +16,10 @@ public static class Utility
         }
     }
 
-    public static IReadOnlyList<IHtmlNode> LoadNodes(HtmlParserContext context)
+    public static IReadOnlyList<IHtmlNode> LoadNodes(
+        HtmlParserContext context,
+        string sharedFolder,
+        Dictionary<string, List<IHtmlNode>> sharedContents)
     {
         List<IHtmlNode> nodes = [];
         while (!context.IsEnd())
@@ -78,7 +81,7 @@ public static class Utility
             }
 
             int elementStartPosition = context.CurrentPosition;
-            ElementNode elementNode = ElementNode.Parse(context);
+            ElementNode elementNode = ElementNode.Parse(context, sharedFolder, sharedContents);
             switch(elementNode.Name)
             {
                 case "variable":
@@ -110,6 +113,32 @@ public static class Utility
                     }
 
                     context.Variables[VariableNames.TemplateName] = templateName;
+                    break;
+                case "include":
+                    const string SharedContentAttributeName = "name";
+                    string contentName = GetAttributeValue(elementNode.Attributes, SharedContentAttributeName);
+                    if (string.IsNullOrEmpty(contentName))
+                    {
+                        throw new InvalidDataException(
+                            $"Include element requires '{SharedContentAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                    }
+
+                    if (!sharedContents.TryGetValue(contentName, out List<IHtmlNode>? contents))
+                    {
+                        string sharedContentFullPath = Path.Combine(sharedFolder, $"{contentName}.html");
+                        if (!File.Exists(sharedContentFullPath))
+                        {
+                            contents = [];
+                        }
+                        else
+                        {
+                            contents = [];
+                        }
+
+                        sharedContents.Add(contentName, contents);
+                    }
+
+                    nodes.AddRange(contents);
                     break;
                 case BuildActions.BuildElementName:
                     string buildTypeName = GetAttributeValue(elementNode.Attributes, BuildActions.BuildTypeAttributeName);

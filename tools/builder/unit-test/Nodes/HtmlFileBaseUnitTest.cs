@@ -34,7 +34,7 @@ public sealed class HtmlFileBaseUnitTest
         File.WriteAllText(fullPath, builder.ToString());
 
         // Act
-        HtmlFileBase fileBase = new(fullPath, folderName, allowComment);
+        HtmlFileBase fileBase = new(fullPath, folderName, allowComment, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         Assert.AreEqual(allowComment, fileBase.AllowComment);
@@ -64,7 +64,7 @@ public sealed class HtmlFileBaseUnitTest
         File.WriteAllText(fullPath, builder.ToString());
 
         // Act
-        HtmlFileBase fileBase = new(fullPath, folderName, true);
+        HtmlFileBase fileBase = new(fullPath, folderName, true, TestUtility.CreateUniqueName("shared"), []);
         StringBuilder actual = new();
         fileBase.Render(actual, new Dictionary<string, object>());
 

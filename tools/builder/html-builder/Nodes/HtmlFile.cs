@@ -4,7 +4,8 @@ using System.Text;
 
 public class HtmlFile : HtmlFileBase
 {
-    public HtmlFile(string fullPath, string folder, bool allowComment) : base(fullPath, folder, allowComment)
+    public HtmlFile(string fullPath, string folder, bool allowComment, string sharedFolder, Dictionary<string, List<IHtmlNode>> sharedContents)
+        : base(fullPath, folder, allowComment, sharedFolder, sharedContents)
     {
         string? templateName = null;
         if (this.Variables.TryGetValue(VariableNames.TemplateName, out object? value))
@@ -22,7 +23,6 @@ public class HtmlFile : HtmlFileBase
         StringBuilder builder = new(4196);
         Dictionary<string, object> variables = new(globalVariables);
         variables.Append(this.Variables);
-
 
         if (string.IsNullOrEmpty(this.TemplateName))
         {
@@ -44,7 +44,12 @@ public class HtmlFile : HtmlFileBase
             if (templates.TryGetValue(this.TemplateName, out HtmlTemplate? template) || (template is null))
             {
                 string templateFolder = (string)globalVariables[VariableNames.TemplateFolder];
-                template = new HtmlTemplate(Path.Combine(templateFolder, $"{this.TemplateName}.html"), templateFolder, this.AllowComment);
+                template = new HtmlTemplate(
+                    Path.Combine(templateFolder, $"{this.TemplateName}.html"),
+                    templateFolder,
+                    this.AllowComment,
+                    this.SharedFolder, 
+                    this.SharedContents);
                 templates[this.TemplateName] = template;
             }
 

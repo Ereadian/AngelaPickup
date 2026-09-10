@@ -95,7 +95,7 @@ public sealed class ElementNodeUnitTest
         HtmlParserContext context = TestUtility.CreateContext(Random.Shared, content);
 
         // Act
-        ElementNode element = ElementNode.Parse(context);
+        ElementNode element = ElementNode.Parse(context, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         Assert.AreEqual(name, element.Name);
@@ -118,7 +118,7 @@ public sealed class ElementNodeUnitTest
         HtmlParserContext context = TestUtility.CreateContext(Random.Shared, builder.ToString());
 
         // Act
-        ElementNode element = ElementNode.Parse(context);
+        ElementNode element = ElementNode.Parse(context, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         Assert.AreEqual(name, element.Name);
@@ -147,7 +147,7 @@ public sealed class ElementNodeUnitTest
         HtmlParserContext context = TestUtility.CreateContext(Random.Shared, builder.ToString());
 
         // Act
-        ElementNode element = ElementNode.Parse(context);
+        ElementNode element = ElementNode.Parse(context, TestUtility.CreateUniqueName("shared"), []);
 
         // Assert
         Assert.AreEqual(name, element.Name);
