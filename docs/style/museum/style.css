@@ -413,8 +413,11 @@ footer a {
 	}
    
 .sidebar h3 {
-	text-indent: 100%;
 	white-space: nowrap;
+	color: red;
+	/*
+	text-indent: 100%;
+	*/
 	overflow: hidden;
 	}
 	
@@ -423,6 +426,15 @@ footer a {
 	padding: 0px 5px 0px 5px;
 	margin: 0px;
 	height: 70px;
+	}
+
+.sidebar h3 span {
+	position: relative;
+	font-size: 120%;
+	top: 28px;
+	left: 50px;
+	color: white;
+	font-weight: bold;
 	}
 
 .sidebar .design-archives h3 {
