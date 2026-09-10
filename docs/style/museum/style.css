@@ -123,15 +123,34 @@ header {
 	height: 400px;
 	}
 
+header h1 {
+	margin: 0px 410px 0px 50px;
+	padding-top: 100px;
+	text-align: center;
+	white-space: nowrap;
+}
+
+header h2 {
+	margin: 30px 410px 0px 50px;
+	text-align: center;
+	white-space: nowrap;
+}
+
+/*
 header h1, 
 header h2 {
 	display: none;
 	}
+*/
 
 /* --- quickSummary --- */	
 
 .summary p:first-child {
-	display: none;
+	position: absolute;
+	top: 190px;
+	left: 50px;	
+	width: 300px;
+	text-align: center;
 	}
 
 .summary p:last-child {
