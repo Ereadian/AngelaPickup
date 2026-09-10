@@ -136,13 +136,6 @@ header h2 {
 	white-space: nowrap;
 }
 
-/*
-header h1, 
-header h2 {
-	display: none;
-	}
-*/
-
 /* --- quickSummary --- */	
 
 .summary p:first-child {
