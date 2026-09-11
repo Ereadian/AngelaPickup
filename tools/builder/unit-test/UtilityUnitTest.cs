@@ -191,6 +191,50 @@ public sealed class UtilityUnitTest
         Assert.IsTrue(TestUtility.AreNodeListsEqual(expected, actual));
     }
 
+    [TestMethod]
+    public void Utility_LoadNodes_WithInclude_ReturnExpected()
+    {
+        // Arrange
+        Random random = Random.Shared;
+        int includeNodeCount = random.Next(5, 10);
+
+        TemporaryFolder temporaryFolder = new(TestUtility.CreateUniqueName("TestFolder"));
+        string sourceRootFolder = Path.Combine(temporaryFolder.FullPath, TestUtility.CreateUniqueName("source-folder"));
+        Directory.CreateDirectory(sourceRootFolder);
+        string sharedContentFolder = Path.Combine(temporaryFolder.FullPath, TestUtility.CreateUniqueName("shared-folder"));
+        Directory.CreateDirectory(sharedContentFolder);
+
+        string prefix = TestUtility.CreateUniqueName("prefix");
+        string suffix = TestUtility.CreateUniqueName("suffix");
+        string sharedContentName = TestUtility.CreateUniqueName("shared");
+        StringBuilder builder = new (prefix);
+        _ = builder.Append("<include name='").Append(sharedContentName).Append("'/>").Append(suffix);
+
+        string sourceFullPath = Path.Combine(sourceRootFolder, $"{TestUtility.CreateUniqueName("source")}.html");
+        File.WriteAllText(sourceFullPath, builder.ToString());
+        builder.Clear();
+
+        List<IHtmlNode> expected = [];
+        expected.Add(new LiteratureNode(prefix));
+        for (int i=0; i< includeNodeCount; i++)
+        {
+            string elementName = TestUtility.CreateUniqueName($"element_{i}");
+            _ = builder.Append('<').Append(elementName).Append("/>");
+            expected.Add(new ElementNode(elementName, [], [], true));
+        }
+
+        expected.Add(new LiteratureNode(suffix));
+        File.WriteAllText(Path.Combine(sharedContentFolder, $"{sharedContentName}.html"), builder.ToString());
+
+        // Act
+        HtmlParserContext context = new (sourceFullPath, string.Empty, true);
+        Dictionary<string, List<IHtmlNode>> sharedContentCache = [];
+        IReadOnlyList<IHtmlNode> actual = Utility.LoadNodes(context, sharedContentFolder, sharedContentCache);
+
+        // Assert
+        Assert.IsTrue(TestUtility.AreNodeListsEqual(expected, actual));
+    }
+
     private static List<IHtmlNode> CreateElements(StringBuilder builder, int layerId, int childCount, int attributeCount)
     {
         List<IHtmlNode> nodes = [];

@@ -132,7 +132,8 @@ public static class Utility
                         }
                         else
                         {
-                            contents = [];
+                            HtmlFile file = new (sharedContentFullPath, string.Empty, context.AllowComment, sharedFolder, sharedContents);
+                            contents = [.. file.Nodes];
                         }
 
                         sharedContents.Add(contentName, contents);
