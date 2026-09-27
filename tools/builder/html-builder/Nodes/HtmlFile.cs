@@ -4,7 +4,7 @@ using System.Text;
 
 public class HtmlFile : HtmlFileBase
 {
-    public HtmlFile(string fullPath, string folder, bool allowComment, string sharedFolder, Dictionary<string, List<IHtmlNode>> sharedContents)
+    public HtmlFile(string fullPath, string folder, bool allowComment, string sharedFolder, Dictionary<string, HtmlFile> sharedContents)
         : base(fullPath, folder, allowComment, sharedFolder, sharedContents)
     {
         string? templateName = null;

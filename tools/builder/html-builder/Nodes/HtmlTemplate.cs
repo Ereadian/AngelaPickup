@@ -1,10 +1,8 @@
 namespace ereadian.builder.html.Nodes;
 
-using System.Text;
-
 public class HtmlTemplate : HtmlFileBase
 {
-    public HtmlTemplate(string fullPath, string folder, bool allowComment, string sharedFolder, Dictionary<string, List<IHtmlNode>> sharedContents)
+    public HtmlTemplate(string fullPath, string folder, bool allowComment, string sharedFolder, Dictionary<string, HtmlFile> sharedContents)
         : base(fullPath, folder, allowComment, sharedFolder, sharedContents)
     {
     }

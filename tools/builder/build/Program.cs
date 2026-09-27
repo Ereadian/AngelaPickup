@@ -41,7 +41,7 @@ internal class Program
         Console.WriteLine("\tTarget: {0}", targetFolder);
         Console.WriteLine("\tTemplate: {0}", templateFolder);
         Console.WriteLine("\tCulture: {0}", transformer.SiteCultureInfo.DisplayName);
-        Dictionary<string, List<IHtmlNode>> sharedContents = [];
+        Dictionary<string, HtmlFile> sharedContents = [];
         Process(transformer, sourceFolder, targetFolder, string.Empty ,sharedFolder, sharedContents);
         Console.WriteLine("Build completed.");
         return 0;
@@ -53,7 +53,7 @@ internal class Program
         string targetRootFolder,
         string relativePath,
         string sharedFolder,
-        Dictionary<string, List<IHtmlNode>> sharedContents)
+        Dictionary<string, HtmlFile> sharedContents)
     {
         string finalSourceFolder = GetPath(sourceRootFolder, relativePath);
         string finalTargetFolder = PrepareFolder(targetRootFolder, relativePath);

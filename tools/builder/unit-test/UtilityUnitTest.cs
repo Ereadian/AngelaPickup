@@ -228,7 +228,7 @@ public sealed class UtilityUnitTest
 
         // Act
         HtmlParserContext context = new (sourceFullPath, string.Empty, true);
-        Dictionary<string, List<IHtmlNode>> sharedContentCache = [];
+        Dictionary<string, HtmlFile> sharedContentCache = [];
         IReadOnlyList<IHtmlNode> actual = Utility.LoadNodes(context, sharedContentFolder, sharedContentCache);
 
         // Assert

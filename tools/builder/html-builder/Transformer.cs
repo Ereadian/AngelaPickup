@@ -29,7 +29,7 @@ public class Transformer
 
     public CultureInfo SiteCultureInfo {get;}
 
-    public string ProcessFile(string fullPath, string folder, string sharedFolder, Dictionary<string, List<IHtmlNode>> sharedContents)
+    public string ProcessFile(string fullPath, string folder, string sharedFolder, Dictionary<string, HtmlFile> sharedContents)
     {
         HtmlFile file = new HtmlFile(fullPath, folder, this.allowComment, sharedFolder, sharedContents);
         return file.Render(this.globalVariables);

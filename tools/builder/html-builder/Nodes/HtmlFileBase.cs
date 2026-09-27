@@ -4,7 +4,7 @@ using System.Text;
 
 public class HtmlFileBase : INodeCollection
 {
-    public HtmlFileBase(string fullPath, string folder, bool allowComment, string sharedFolder, Dictionary<string, List<IHtmlNode>> sharedContents)
+    public HtmlFileBase(string fullPath, string folder, bool allowComment, string sharedFolder, Dictionary<string, HtmlFile> sharedContents)
     {
         this.AllowComment = allowComment;
         this.SharedFolder = sharedFolder;
@@ -25,7 +25,7 @@ public class HtmlFileBase : INodeCollection
     public bool AllowComment {get;}
 
     protected string SharedFolder {get;}
-    protected Dictionary<string, List<IHtmlNode>> SharedContents {get;}
+    protected Dictionary<string, HtmlFile> SharedContents {get;}
 
     public virtual void Render(in StringBuilder builder, in IDictionary<string, object> variables)
     {

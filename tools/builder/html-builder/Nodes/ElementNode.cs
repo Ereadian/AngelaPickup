@@ -15,7 +15,7 @@ public class ElementNode(
     public IReadOnlyList<AttributeNode> Attributes => attributes;
     public IReadOnlyList<IHtmlNode> Children => children;
 
-    public static ElementNode Parse(HtmlParserContext context, string sharedFolder, Dictionary<string, List<IHtmlNode>> sharedContents)
+    public static ElementNode Parse(HtmlParserContext context, string sharedFolder, Dictionary<string, HtmlFile> sharedContents)
     {
         if (context.GetCurrentChar() != '<')
         {
