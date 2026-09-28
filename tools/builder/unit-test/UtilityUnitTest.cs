@@ -233,6 +233,9 @@ public sealed class UtilityUnitTest
 
         // Assert
         Assert.IsTrue(TestUtility.AreNodeListsEqual(expected, actual));
+        Assert.IsTrue(sharedContentCache.TryGetValue(sharedContentName, out HtmlFile? cachedContent));
+        Assert.IsNotNull(cachedContent);
+        Assert.IsTrue(TestUtility.AreNodeListsEqual(expected.Skip(1).Take(includeNodeCount).ToArray(), cachedContent.Nodes));
     }
 
     private static List<IHtmlNode> CreateElements(StringBuilder builder, int layerId, int childCount, int attributeCount)
