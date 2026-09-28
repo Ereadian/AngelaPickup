@@ -216,6 +216,7 @@ public sealed class UtilityUnitTest
 
         List<IHtmlNode> expected = [];
         expected.Add(new LiteratureNode(prefix));
+        _ = builder.Append("<html>");
         for (int i=0; i< includeNodeCount; i++)
         {
             string elementName = TestUtility.CreateUniqueName($"element_{i}");
@@ -224,6 +225,7 @@ public sealed class UtilityUnitTest
         }
 
         expected.Add(new LiteratureNode(suffix));
+        _ = builder.Append("</html>");
         File.WriteAllText(Path.Combine(sharedContentFolder, $"{sharedContentName}.html"), builder.ToString());
 
         // Act
@@ -235,7 +237,7 @@ public sealed class UtilityUnitTest
         Assert.IsTrue(TestUtility.AreNodeListsEqual(expected, actual));
         Assert.IsTrue(sharedContentCache.TryGetValue(sharedContentName, out HtmlFile? cachedContent));
         Assert.IsNotNull(cachedContent);
-        Assert.IsTrue(TestUtility.AreNodeListsEqual(expected.Skip(1).Take(includeNodeCount).ToArray(), cachedContent.Nodes));
+        Assert.IsTrue(TestUtility.AreNodeListsEqual(expected.Skip(1).Take(includeNodeCount).ToArray(), ((ElementNode)cachedContent.Nodes[0]).Children));
     }
 
     private static List<IHtmlNode> CreateElements(StringBuilder builder, int layerId, int childCount, int attributeCount)

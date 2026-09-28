@@ -168,8 +168,12 @@ public static class Utility
                         sharedContents.Add(contentName, sharedFile);
                     }
 
-                    nodes.AddRange(sharedFile.Nodes);
                     context.Variables.Append(sharedFile.Variables);
+                    ElementNode? htmlNode = sharedFile.Nodes.FirstOrDefault(node => (node.NodeType == NodeType.Element) && ((ElementNode)node).Name == "html") as ElementNode;
+                    if (htmlNode != null)
+                    {
+                        nodes.AddRange(htmlNode.Children.Where(node => (node.NodeType != NodeType.Element) || ((ElementNode)node).Name != "body"));
+                    }
                     break;
                 case BuildActions.BuildElementName:
                     string buildTypeName = GetAttributeValue(elementNodeToAdd.Attributes, BuildActions.BuildTypeAttributeName);
