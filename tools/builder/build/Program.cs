@@ -12,6 +12,8 @@ internal class Program
     private const string DefaultSharedContentFolder = "shared";
     private const string HtmlFileExtension = ".html";
 
+    private const string QrCodeFolderName = "qr-code-img";
+
     private static readonly string RepositoryRootFolder;
 
     private static readonly Uri HostUri = new ("https://ereadian.github.io/AngelaPickup/");
@@ -68,7 +70,7 @@ internal class Program
             if (!HtmlFileExtension.Equals(extension, StringComparison.OrdinalIgnoreCase))
             {
                 Console.Write("\t copy {0}", fileName);
-                File.Copy(fileFullPath, finalTargetFileName, EnableOverride);
+                File.Copy(fileFullPath, finalTargetFileName, EnableOverride || finalTargetFileName.EndsWith(".html.png", StringComparison.OrdinalIgnoreCase));
             }
             else
             {
@@ -79,7 +81,8 @@ internal class Program
                     sourceRootFolder,
                     targetRootFolder,
                     relativePath,
-                    fileFullPath);
+                    fileFullPath,
+                    QrCodeFolderName);
 
                 string finalHtml = transformer.ProcessFile(fileFullPath, relativePath, sharedFolder, sharedContents, pageUrl);
                 File.WriteAllText(finalTargetFileName, finalHtml);

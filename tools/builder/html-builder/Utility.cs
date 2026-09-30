@@ -126,8 +126,8 @@ public static class Utility
         string targetRootFolder,
         string relativeFolder,
         string fullPath,
-        int pixelsPerModule = 20,
-        string qrCodeFolderName = "qr-code-img")
+        string qrCodeFolderName,
+        int pixelsPerModule = 20)
     {
         string fileName = Path.GetFileName(fullPath);
         string qrFileName = fileName + ".png";
