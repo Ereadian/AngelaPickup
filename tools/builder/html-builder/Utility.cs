@@ -2,15 +2,18 @@ namespace ereadian.builder.html;
 
 using System.Text;
 using ereadian.builder.html.Nodes;
+using QRCoder;
 
 public static class Utility
 {
+    private static readonly Lazy<QRCodeGenerator> QRCodeGeneratorLoader = new(true);
+
     public static void RenderNodes(
         in IReadOnlyList<IHtmlNode> nodes,
         in StringBuilder builder,
         in IDictionary<string, object> variables)
     {
-        foreach(IHtmlNode node in nodes)
+        foreach (IHtmlNode node in nodes)
         {
             node.Render(builder, variables);
         }
@@ -96,7 +99,7 @@ public static class Utility
     public static IReadOnlyList<ElementNode> GetElementNodes(IReadOnlyList<IHtmlNode> nodes)
     {
         List<ElementNode> elements = new(nodes.Count);
-        foreach(IHtmlNode node in nodes)
+        foreach (IHtmlNode node in nodes)
         {
             if (node.NodeType == NodeType.Element)
             {
@@ -107,6 +110,57 @@ public static class Utility
         return elements;
     }
 
+
+    public static void EnsureDirectoryCreated(string? folderFullPath)
+    {
+        while (!string.IsNullOrEmpty(folderFullPath) && !Directory.Exists(folderFullPath))
+        {
+            EnsureDirectoryCreated(Path.GetDirectoryName(folderFullPath));
+            Directory.CreateDirectory(folderFullPath);
+        }
+    }
+
+    public static string GenerateQrCode(
+        Uri hostUri,
+        string sourceRootFolder,
+        string targetRootFolder,
+        string relativeFolder,
+        string fullPath,
+        int pixelsPerModule = 20,
+        string qrCodeFolderName = "qr-code-img")
+    {
+        string fileName = Path.GetFileName(fullPath);
+        string qrFileName = fileName + ".png";
+
+        string relativeFilePath = Path.Combine(relativeFolder, fileName);
+        Uri finalUri = new(hostUri, relativeFilePath);
+        string finalUrl = finalUri.ToString();
+
+        string targetFolder = Path.Combine(targetRootFolder, relativeFolder, qrCodeFolderName);
+        string targetFullPath = Path.Combine(targetFolder, qrFileName);
+        if (!File.Exists(targetFullPath))
+        {
+            string sourceFolder = Path.Combine(sourceRootFolder, relativeFolder, qrCodeFolderName);
+            string sourceFullPath = Path.Combine(sourceFolder, qrFileName);
+            if (!File.Exists(sourceFullPath))
+            {
+                EnsureDirectoryCreated(sourceFolder);
+
+                QRCodeGenerator qrGenerator = QRCodeGeneratorLoader.Value;
+                using var qrCodeData = qrGenerator.CreateQrCode(finalUrl, QRCodeGenerator.ECCLevel.Q);
+                using var pngQrCode = new PngByteQRCode(qrCodeData);
+                byte[] qrCodeBytes = pngQrCode.GetGraphic(pixelsPerModule);
+
+                File.WriteAllBytes(sourceFullPath, qrCodeBytes);
+            }
+
+            EnsureDirectoryCreated(targetFolder);
+            File.Copy(sourceFullPath, targetFullPath);
+        }
+
+        return finalUrl;
+    }
+
     private static void AddElement(
         List<IHtmlNode> nodes,
         int elementStartPosition,
@@ -115,87 +169,87 @@ public static class Utility
         string sharedFolder,
         Dictionary<string, HtmlFile> sharedContents)
     {
-            switch(elementNodeToAdd.Name)
-            {
-                case "variable":
-                    const string VariableNameAttributeName = "name";
-                    string variableName = GetAttributeValue(elementNodeToAdd.Attributes, VariableNameAttributeName);
-                    if (string.IsNullOrEmpty(variableName))
+        switch (elementNodeToAdd.Name)
+        {
+            case "variable":
+                const string VariableNameAttributeName = "name";
+                string variableName = GetAttributeValue(elementNodeToAdd.Attributes, VariableNameAttributeName);
+                if (string.IsNullOrEmpty(variableName))
+                {
+                    throw new InvalidDataException(
+                        $"Variable element requires '{VariableNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                }
+
+                const string VariableValueAttributeName = "value";
+                string variableValue = GetAttributeValue(elementNodeToAdd.Attributes, VariableValueAttributeName);
+                if (string.IsNullOrEmpty(variableValue))
+                {
+                    throw new InvalidDataException(
+                        $"Variable element requires '{VariableValueAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                }
+
+                context.Variables[variableName] = variableValue;
+                break;
+            case "template":
+                const string TemplateNameAttributeName = "name";
+                string templateName = GetAttributeValue(elementNodeToAdd.Attributes, TemplateNameAttributeName);
+                if (string.IsNullOrEmpty(templateName))
+                {
+                    throw new InvalidDataException(
+                        $"Template element requires '{TemplateNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                }
+
+                context.Variables[VariableNames.TemplateName] = templateName;
+                break;
+            case "include":
+                const string SharedContentAttributeName = "name";
+                string contentName = GetAttributeValue(elementNodeToAdd.Attributes, SharedContentAttributeName);
+                if (string.IsNullOrEmpty(contentName))
+                {
+                    throw new InvalidDataException(
+                        $"Include element requires '{SharedContentAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                }
+
+                if (!sharedContents.TryGetValue(contentName, out HtmlFile? sharedFile))
+                {
+                    string sharedContentFullPath = Path.Combine(sharedFolder, $"{contentName}.html");
+                    if (!File.Exists(sharedContentFullPath))
                     {
-                        throw new InvalidDataException(
-                            $"Variable element requires '{VariableNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                        return;
                     }
 
-                    const string VariableValueAttributeName = "value";
-                    string variableValue = GetAttributeValue(elementNodeToAdd.Attributes, VariableValueAttributeName);
-                    if (string.IsNullOrEmpty(variableValue))
-                    {
-                        throw new InvalidDataException(
-                            $"Variable element requires '{VariableValueAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
-                    }
+                    sharedFile = new(sharedContentFullPath, string.Empty, context.AllowComment, sharedFolder, sharedContents);
+                    sharedContents.Add(contentName, sharedFile);
+                }
 
-                    context.Variables[variableName] = variableValue;
-                    break;
-                case "template":
-                    const string TemplateNameAttributeName = "name";
-                    string templateName = GetAttributeValue(elementNodeToAdd.Attributes, TemplateNameAttributeName);
-                    if (string.IsNullOrEmpty(templateName))
-                    {
-                        throw new InvalidDataException(
-                            $"Template element requires '{TemplateNameAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
-                    }
+                context.Variables.Append(sharedFile.Variables);
+                ElementNode? htmlNode = sharedFile.Nodes.FirstOrDefault(node => (node.NodeType == NodeType.Element) && ((ElementNode)node).Name == "html") as ElementNode;
+                if (htmlNode != null)
+                {
+                    nodes.AddRange(htmlNode.Children.Where(node => (node.NodeType != NodeType.Element) || ((ElementNode)node).Name != "body"));
+                }
+                break;
+            case BuildActions.BuildElementName:
+                string buildTypeName = GetAttributeValue(elementNodeToAdd.Attributes, BuildActions.BuildTypeAttributeName);
+                if (string.IsNullOrEmpty(buildTypeName))
+                {
+                    throw new InvalidDataException(
+                        $"Build element requires '{BuildActions.BuildTypeAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                }
 
-                    context.Variables[VariableNames.TemplateName] = templateName;
-                    break;
-                case "include":
-                    const string SharedContentAttributeName = "name";
-                    string contentName = GetAttributeValue(elementNodeToAdd.Attributes, SharedContentAttributeName);
-                    if (string.IsNullOrEmpty(contentName))
-                    {
-                        throw new InvalidDataException(
-                            $"Include element requires '{SharedContentAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
-                    }
+                if (!BuildActions.Actions.TryGetValue(buildTypeName, out var buildAction))
+                {
+                    throw new InvalidDataException(
+                        $"Unknown build action name '{buildTypeName}'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
+                }
 
-                    if (!sharedContents.TryGetValue(contentName, out HtmlFile? sharedFile))
-                    {
-                        string sharedContentFullPath = Path.Combine(sharedFolder, $"{contentName}.html");
-                        if (!File.Exists(sharedContentFullPath))
-                        {
-                            return;
-                        }
-
-                        sharedFile = new (sharedContentFullPath, string.Empty, context.AllowComment, sharedFolder, sharedContents);
-                        sharedContents.Add(contentName, sharedFile);
-                    }
-
-                    context.Variables.Append(sharedFile.Variables);
-                    ElementNode? htmlNode = sharedFile.Nodes.FirstOrDefault(node => (node.NodeType == NodeType.Element) && ((ElementNode)node).Name == "html") as ElementNode;
-                    if (htmlNode != null)
-                    {
-                        nodes.AddRange(htmlNode.Children.Where(node => (node.NodeType != NodeType.Element) || ((ElementNode)node).Name != "body"));
-                    }
-                    break;
-                case BuildActions.BuildElementName:
-                    string buildTypeName = GetAttributeValue(elementNodeToAdd.Attributes, BuildActions.BuildTypeAttributeName);
-                    if (string.IsNullOrEmpty(buildTypeName))
-                    {
-                        throw new InvalidDataException(
-                            $"Build element requires '{BuildActions.BuildTypeAttributeName} attribute and the value should not be empty'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
-                    }
-
-                    if (!BuildActions.Actions.TryGetValue(buildTypeName, out var buildAction))
-                    {
-                        throw new InvalidDataException(
-                            $"Unknown build action name '{buildTypeName}'. File: '{context.FullPath}'.Content:\n{context.Content.Substring(elementStartPosition)}");
-                    }
-
-                    DynamicNode dynamicNode = new (elementNodeToAdd, buildAction);
-                    nodes.Add(dynamicNode);
-                    break;
-                default:
-                    nodes.Add(elementNodeToAdd);
-                    break;
-            }
+                DynamicNode dynamicNode = new(elementNodeToAdd, buildAction);
+                nodes.Add(dynamicNode);
+                break;
+            default:
+                nodes.Add(elementNodeToAdd);
+                break;
+        }
     }
 
     private static LiteratureNode CreateMarkNode(HtmlParserContext context, string openTag, string closeTag)

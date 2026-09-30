@@ -14,6 +14,8 @@ internal class Program
 
     private static readonly string RepositoryRootFolder;
 
+    private static readonly Uri HostUri = new ("https://ereadian.github.io/AngelaPickup/");
+
 #if DEBUG
     private const bool EnableOverride = true;
 #else
@@ -71,7 +73,15 @@ internal class Program
             else
             {
                 Console.Write("\t process {0}", fileName);
-                string finalHtml = transformer.ProcessFile(fileFullPath, relativePath, sharedFolder, sharedContents);
+
+                string pageUrl = Utility.GenerateQrCode(
+                    HostUri,
+                    sourceRootFolder,
+                    targetRootFolder,
+                    relativePath,
+                    fileFullPath);
+
+                string finalHtml = transformer.ProcessFile(fileFullPath, relativePath, sharedFolder, sharedContents, pageUrl);
                 File.WriteAllText(finalTargetFileName, finalHtml);
             }
 

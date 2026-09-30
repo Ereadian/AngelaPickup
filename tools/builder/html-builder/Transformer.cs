@@ -29,9 +29,10 @@ public class Transformer
 
     public CultureInfo SiteCultureInfo {get;}
 
-    public string ProcessFile(string fullPath, string folder, string sharedFolder, Dictionary<string, HtmlFile> sharedContents)
+    public string ProcessFile(string fullPath, string folder, string sharedFolder, Dictionary<string, HtmlFile> sharedContents, string url)
     {
         HtmlFile file = new HtmlFile(fullPath, folder, this.allowComment, sharedFolder, sharedContents);
+        file.Variables[VariableNames.PageUrl] = url;
         return file.Render(this.globalVariables);
     }
 }
