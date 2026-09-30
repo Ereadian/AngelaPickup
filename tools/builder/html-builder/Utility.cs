@@ -126,7 +126,7 @@ public static class Utility
         string targetRootFolder,
         string relativeFolder,
         string fullPath,
-        string qrCodeFolderName,
+        string qrCodeFolderName = "qr-code-img",
         int pixelsPerModule = 20)
     {
         string fileName = Path.GetFileName(fullPath);
@@ -158,7 +158,7 @@ public static class Utility
             File.Copy(sourceFullPath, targetFullPath);
         }
 
-        return finalUrl;
+        return Path.Combine(qrCodeFolderName, qrFileName);
     }
 
     private static void AddElement(

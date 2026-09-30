@@ -16,5 +16,5 @@ public static class VariableNames
     public const string TemplateCollection = "templates";
     public const string RootElementsToInject = "root-elements-to-inject";
 
-    public const string PageUrl = "page-url";
+    public const string QRCodeUrl = "qr-code-url";
 }

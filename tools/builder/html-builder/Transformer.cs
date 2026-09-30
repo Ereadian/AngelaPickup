@@ -29,10 +29,10 @@ public class Transformer
 
     public CultureInfo SiteCultureInfo {get;}
 
-    public string ProcessFile(string fullPath, string folder, string sharedFolder, Dictionary<string, HtmlFile> sharedContents, string url)
+    public string ProcessFile(string fullPath, string folder, string sharedFolder, Dictionary<string, HtmlFile> sharedContents, string qrCodeUrl)
     {
         HtmlFile file = new HtmlFile(fullPath, folder, this.allowComment, sharedFolder, sharedContents);
-        file.Variables[VariableNames.PageUrl] = url;
+        file.Variables[VariableNames.QRCodeUrl] = qrCodeUrl;
         return file.Render(this.globalVariables);
     }
 }

@@ -2,6 +2,7 @@ namespace ereadian.builder.html;
 
 using System.Globalization;
 using System.Text;
+using System.Web;
 using ereadian.builder.html.Nodes;
 
 public static class BuildActions
@@ -15,6 +16,7 @@ public static class BuildActions
             {nameof(RenderSiteBuildTime), RenderSiteBuildTime},
             {nameof(RenderDateTime), RenderDateTime},
             {nameof(InjectHtmlElement), InjectHtmlElement},
+            {nameof(RenderQRCode), RenderQRCode},
         };
 
     /// <summary>
@@ -95,13 +97,39 @@ public static class BuildActions
             Dictionary<string, List<ElementNode>> elementMapping = (Dictionary<string, List<ElementNode>>)rowMapping;
             if (elementMapping.TryGetValue(elementTag, out List<ElementNode>? elements))
             {
-                foreach(ElementNode element in elements)
+                foreach (ElementNode element in elements)
                 {
                     if ((elementName.Length < 1) || (elementName == Utility.GetAttributeValue(element.Attributes, "name").Trim()))
                     {
                         Utility.RenderNodes(element.Children, builder, variables);
                     }
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Render QR code for current page.
+    /// </summary>
+    /// <param name="elementNode">the element contains the details.</param>
+    /// <param name="builder">the string builder.</param>
+    /// <param name="variables">the render variables.</param>
+    /// <example>
+    /// <![CDATA[
+    /// <build type="RenderQRCode" />
+    /// ]]>
+    /// </example>
+    public static void RenderQRCode(
+        ElementNode elementNode,
+        StringBuilder builder,
+        IDictionary<string, object> variables)
+    {
+        if (variables.TryGetValue(VariableNames.QRCodeUrl, out object? data))
+        {
+            string? url = data as string;
+            if (!string.IsNullOrEmpty(url))
+            {
+                _ = builder.Append("<img src=\"").Append(HttpUtility.UrlEncode(url)).Append("\" />");
             }
         }
     }

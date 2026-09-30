@@ -12,8 +12,6 @@ internal class Program
     private const string DefaultSharedContentFolder = "shared";
     private const string HtmlFileExtension = ".html";
 
-    private const string QrCodeFolderName = "qr-code-img";
-
     private static readonly string RepositoryRootFolder;
 
     private static readonly Uri HostUri = new ("https://ereadian.github.io/AngelaPickup/");
@@ -76,15 +74,14 @@ internal class Program
             {
                 Console.Write("\t process {0}", fileName);
 
-                string pageUrl = Utility.GenerateQrCode(
+                string qrCodeUrl = Utility.GenerateQrCode(
                     HostUri,
                     sourceRootFolder,
                     targetRootFolder,
                     relativePath,
-                    fileFullPath,
-                    QrCodeFolderName);
+                    fileFullPath);
 
-                string finalHtml = transformer.ProcessFile(fileFullPath, relativePath, sharedFolder, sharedContents, pageUrl);
+                string finalHtml = transformer.ProcessFile(fileFullPath, relativePath, sharedFolder, sharedContents, qrCodeUrl);
                 File.WriteAllText(finalTargetFileName, finalHtml);
             }
 
