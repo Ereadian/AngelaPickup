@@ -17,6 +17,7 @@ public static class BuildActions
             {nameof(RenderDateTime), RenderDateTime},
             {nameof(InjectHtmlElement), InjectHtmlElement},
             {nameof(RenderQRCode), RenderQRCode},
+            {nameof(RenderRemoveImage), RenderRemoveImage},
         };
 
     /// <summary>
@@ -124,13 +125,46 @@ public static class BuildActions
         StringBuilder builder,
         IDictionary<string, object> variables)
     {
-        if (variables.TryGetValue(VariableNames.QRCodeUrl, out object? data))
+        string? url = Utility.GetVariableValue<string>(variables, VariableNames.QRCodeUrl);
+        if (!string.IsNullOrEmpty(url))
         {
-            string? url = data as string;
-            if (!string.IsNullOrEmpty(url))
+            _ = builder.Append("<img src=\"").Append(HttpUtility.UrlEncode(url)).Append("\" />");
+        }
+    }
+
+    /// <summary>
+    /// Render QR code for current page.
+    /// </summary>
+    /// <param name="elementNode">the element contains the details.</param>
+    /// <param name="builder">the string builder.</param>
+    /// <param name="variables">the render variables.</param>
+    /// <example>
+    /// <![CDATA[
+    /// <build type="RenderRemoveImage" path="public/rose-cedar.jpeg" class="leader-image" />
+    /// ]]>
+    /// </example>
+    public static void RenderRemoveImage(
+        ElementNode elementNode,
+        StringBuilder builder,
+        IDictionary<string, object> variables)
+    {
+        Uri? imageServiceUri = Utility.GetVariableValue<Uri>(variables, VariableNames.RemoveImageServiceRui);
+        if (imageServiceUri != null)
+        {
+            string path = Utility.GetAttributeValue(elementNode.Attributes, "path").Trim();
+            if (!string.IsNullOrWhiteSpace(path))
             {
-                _ = builder.Append("<img src=\"").Append(HttpUtility.UrlEncode(url)).Append("\" />");
+                Uri uri = new Uri(imageServiceUri, path);
+                _ = builder.Append("<img src=\"").Append(uri).Append('\"');
             }
+
+            string style = Utility.GetAttributeValue(elementNode.Attributes, "class").Trim();
+            if (!string.IsNullOrEmpty(style))
+            {
+                _ = builder.Append(" class=\"").Append(style).Append('\"');
+            }
+
+            _ = builder.Append("/>");
         }
     }
 }

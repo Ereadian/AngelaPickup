@@ -252,6 +252,11 @@ public static class Utility
         }
     }
 
+    public static T? GetVariableValue<T>(IDictionary<string, object> variables, string key)
+    {
+        return variables.TryGetValue(key, out object? value) ? (T?)value : default(T);
+    }
+
     private static LiteratureNode CreateMarkNode(HtmlParserContext context, string openTag, string closeTag)
     {
         int endTagPosition = context.Content.IndexOf(closeTag, context.CurrentPosition + openTag.Length);
