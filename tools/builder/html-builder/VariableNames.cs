@@ -17,5 +17,5 @@ public static class VariableNames
     public const string RootElementsToInject = "root-elements-to-inject";
 
     public const string QRCodeUrl = "qr-code-url";
-    public const string RemoveImageServiceRui = "remove-service-uri";
+    public const string RemoveImageServiceUri = "remove-service-uri";
 }

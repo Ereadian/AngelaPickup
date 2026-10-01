@@ -37,7 +37,7 @@ internal class Program
         string templateFolder = arguments.Length < 3 ? GetRepositorySubFolder(DefaultTemplateFolder) : Path.GetFullPath(arguments[2]);
         string sharedFolder = arguments.Length < 4 ? GetRepositorySubFolder(DefaultSharedContentFolder) : Path.GetFullPath(arguments[3]);
 
-        Transformer transformer = new(targetFolder, templateFolder, "zh-Hans", false);
+        Transformer transformer = new(targetFolder, templateFolder, "https://ereadian.github.io/AngelaPickup/remote-images/", "zh-Hans", false);
         Console.WriteLine("Start building.");
         Console.WriteLine("\tSource: {0}", sourceFolder);
         Console.WriteLine("\tTarget: {0}", targetFolder);

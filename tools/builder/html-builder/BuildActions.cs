@@ -148,7 +148,7 @@ public static class BuildActions
         StringBuilder builder,
         IDictionary<string, object> variables)
     {
-        Uri? imageServiceUri = Utility.GetVariableValue<Uri>(variables, VariableNames.RemoveImageServiceRui);
+        Uri? imageServiceUri = Utility.GetVariableValue<Uri>(variables, VariableNames.RemoveImageServiceUri);
         if (imageServiceUri != null)
         {
             string path = Utility.GetAttributeValue(elementNode.Attributes, "path").Trim();

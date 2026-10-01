@@ -8,12 +8,12 @@ public class Transformer
     private readonly Dictionary<string, object> globalVariables; 
     private readonly bool allowComment;
 
-    public Transformer(string outputRootFolder, string templateFolder, string siteCultureName, bool allowComment)
-        : this(outputRootFolder, templateFolder, CultureInfo.GetCultureInfo(siteCultureName), allowComment)
+    public Transformer(string outputRootFolder, string templateFolder, string removeImageServiceUrl, string siteCultureName, bool allowComment)
+        : this(outputRootFolder, templateFolder, removeImageServiceUrl, CultureInfo.GetCultureInfo(siteCultureName), allowComment)
     {
     }
 
-    public Transformer(string outputRootFolder, string templateFolder, CultureInfo cultureInfo, bool allowComment)
+    public Transformer(string outputRootFolder, string templateFolder, string removeImageServiceUrl, CultureInfo cultureInfo, bool allowComment)
     {
         this.SiteCultureInfo = cultureInfo;
         this.allowComment = allowComment;
@@ -21,6 +21,7 @@ public class Transformer
         {
             {VariableNames.OutputRootFolder, outputRootFolder },
             {VariableNames.TemplateFolder, templateFolder },
+            {VariableNames.RemoveImageServiceUri, new Uri(removeImageServiceUrl) },
             {VariableNames.TemplateCollection, new Dictionary<string, HtmlTemplate>() },
             {VariableNames.SiteCulture, cultureInfo },
             {VariableNames.SiteBuildTime, DateTime.UtcNow },
@@ -31,7 +32,7 @@ public class Transformer
 
     public string ProcessFile(string fullPath, string folder, string sharedFolder, Dictionary<string, HtmlFile> sharedContents, string qrCodeUrl)
     {
-        HtmlFile file = new HtmlFile(fullPath, folder, this.allowComment, sharedFolder, sharedContents);
+        HtmlFile file = new (fullPath, folder, this.allowComment, sharedFolder, sharedContents);
         file.Variables[VariableNames.QRCodeUrl] = qrCodeUrl;
         return file.Render(this.globalVariables);
     }
