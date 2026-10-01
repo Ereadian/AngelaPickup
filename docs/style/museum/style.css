@@ -305,23 +305,35 @@ header h2 {
   	margin: 0px;  	
 	}
 
-.explanation-content p img{
+.explanation-content div {
+	padding: 10px 115px 10px 106px; 
+  	margin: 0px;  	
+	}
+
+	.explanation-content p img{
 	padding: 0px; 
   	margin: 0px;
 	width: 300px;  	
 	}
 
-	.explanation-content ul {
+.explanation-content ul {
 	text-indent: 2em;
 	padding: 10px 115px 10px 106px; 
   	margin: 0px;  	
 	}
 
+.explanation-content strong {
+	font-weight: bold;
+	color: #444444;	
+	}
+
+	/*
 .explanation-content p:first-letter {
 	font-size: 180%;
 	font-weight: bold;
 	color: #444444;	
 	}
+*/
 
 .explanation-end {
 	background:url(trans_expl_part.jpg) no-repeat;
